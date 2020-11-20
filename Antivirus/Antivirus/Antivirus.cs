@@ -11,11 +11,7 @@ namespace Antivirus
     {
         public AntivirusReport CheckFile(Analyze analizer,string path)
         {
-            analizer(path);
             return analizer(path);
         }
-
-
-
     }
 }

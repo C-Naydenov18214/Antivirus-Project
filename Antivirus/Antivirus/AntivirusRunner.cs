@@ -23,7 +23,7 @@ namespace Antivirus
             foreach(Task task in tasks)
             {
                 AntivirusReport report = StartSearch(task);
-                Console.WriteLine(report.GetName());
+                //Console.WriteLine(report.GetName());
             } 
 
             
