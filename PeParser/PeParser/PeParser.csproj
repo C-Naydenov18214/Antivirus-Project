@@ -68,6 +68,7 @@
     <Compile Include="ImageOptionalHeader32.cs" />
     <Compile Include="ImageSectionHeader.cs" />
     <Compile Include="PeFile.cs" />
+    <Compile Include="Searcher.cs" />
     <Compile Include="Structures.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PeHeaderReader.cs" />

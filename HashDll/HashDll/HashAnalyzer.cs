@@ -20,10 +20,26 @@ namespace HashDll
             }
 
             byte[] bytes = file.GetSection(".virus").SectionBytes;
+            int n = 0;
             foreach (byte b in bytes)
             {
-                Console.Write(Convert.ToString(b, 16));
+                if (n > 15)
+                {
+                    Console.WriteLine();
+                    n = 0;
+                }
+                Console.Write(b.ToString("X2") + " ");//Convert.ToString(b, 16));
+                n++;
             }
+            Console.WriteLine();
+            Searcher searcher = new Searcher();
+            var res = searcher.FindHeaderWithChar(file, Structures.DataSectionFlags.MemoryExecute);
+            foreach(ImageSectionHeader header in res)
+            {
+
+                Console.Write("section " + header.SectionHeader.Name +"\n");
+            }
+
             return new AntivirusReport(filePath);
         }
 
