@@ -33,12 +33,16 @@ namespace HashDll
             }
             Console.WriteLine();
             Searcher searcher = new Searcher();
-            var res = searcher.FindHeaderWithChar(file, Structures.DataSectionFlags.MemoryExecute);
-            foreach(ImageSectionHeader header in res)
+            var res = searcher.FindHeaderWithChar(file);
+            if (res != null)
             {
+                foreach (ImageSectionHeader header in res)
+                {
 
-                Console.Write("section " + header.SectionHeader.Name +"\n");
+                    Console.Write("section " + new string(header.SectionHeader.Name) + "\n");
+                }
             }
+           
 
             return new AntivirusReport(filePath);
         }
