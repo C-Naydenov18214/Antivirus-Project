@@ -71,11 +71,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="PeParser">
-      <HintPath>..\..\PeParser\PeParser\bin\Debug\PeParser.dll</HintPath>
-    </Reference>
-    <Reference Include="Reporter">
-      <HintPath>..\..\Reporter\Reporter\bin\Debug\Reporter.dll</HintPath>
+    <Reference Include="DeveloperKit">
+      <HintPath>..\..\PeParser\PeParser\bin\Debug\DeveloperKit.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

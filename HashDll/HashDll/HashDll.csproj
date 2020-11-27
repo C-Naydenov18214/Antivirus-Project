@@ -31,11 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PeParser">
-      <HintPath>..\..\PeParser\PeParser\bin\Debug\PeParser.dll</HintPath>
-    </Reference>
-    <Reference Include="Reporter">
-      <HintPath>..\..\Reporter\Reporter\bin\Debug\Reporter.dll</HintPath>
+    <Reference Include="DeveloperKit">
+      <HintPath>..\..\PeParser\PeParser\bin\Debug\DeveloperKit.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -48,7 +45,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HashAnalyzer.cs" />
-    <Compile Include="IAnalyzer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

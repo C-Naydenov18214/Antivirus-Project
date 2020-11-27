@@ -1,13 +1,11 @@
-﻿using System;
+﻿using DeveloperKit.PeReader;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static PeParser.Structures;
+using static DeveloperKit.PeReader.Structures;
 
-namespace PeParser
+namespace DeveloperKit.Context
 {
-    public class PeFile
+    public class PeFileContext
     {
 
         private readonly ImageDosHeader dosHeader;
@@ -17,7 +15,7 @@ namespace PeParser
         private readonly List<ImageSectionHeader> imageSectionHeaders;
         private string name;
 
-        public PeFile(ImageDosHeader dosHeader, ImageFileHeader fileHeader, ImageOptionalHeader32 optionalHeader32, ImageOptionalHeader64 optionalHeader64, string name)
+        public PeFileContext(ImageDosHeader dosHeader, ImageFileHeader fileHeader, ImageOptionalHeader32 optionalHeader32, ImageOptionalHeader64 optionalHeader64, string name)
         {
             this.dosHeader = dosHeader;
             this.fileHeader = fileHeader;

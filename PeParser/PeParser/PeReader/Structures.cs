@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace PeParser
+namespace DeveloperKit.PeReader
 {
     public class Structures
     {

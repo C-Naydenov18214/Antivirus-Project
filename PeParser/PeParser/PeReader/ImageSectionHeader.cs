@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static PeParser.Structures;
+using static DeveloperKit.PeReader.Structures;
 
-namespace PeParser
+namespace DeveloperKit.PeReader
 {
     public class ImageSectionHeader
     {

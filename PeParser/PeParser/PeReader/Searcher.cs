@@ -1,16 +1,17 @@
-﻿using System;
+﻿using DeveloperKit.Context;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static PeParser.Structures;
+using static DeveloperKit.PeReader.Structures;
 
-namespace PeParser
+namespace DeveloperKit.PeReader
 {
     public class Searcher
     {
 
-        public ImageSectionHeader[] FindHeaderWithChar(PeFile pe, params DataSectionFlags[] characteristic)
+        public ImageSectionHeader[] FindHeaderWithChar(PeFileContext pe, params DataSectionFlags[] characteristic)
         {
             List<ImageSectionHeader> results = new List<ImageSectionHeader>();
             

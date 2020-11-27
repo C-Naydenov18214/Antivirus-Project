@@ -1,26 +1,27 @@
-﻿using System;
+﻿using DeveloperKit.Context;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using static PeParser.Structures;
+using static DeveloperKit.PeReader.Structures;
 
-namespace PeParser
+namespace DeveloperKit.PeReader
 {
-    public class PeHeaderReader
+    public class PeReader
     {
 
 
-        public PeHeaderReader()
+        public PeReader()
         {
 
         }
 
-        public PeFile ReadPeFile(string filePath)
+        public PeFileContext ReadPeFile(string filePath)
         {
-            PeFile peFile;
+            PeFileContext peFile;
             using (FileStream stream = new FileStream(filePath, System.IO.FileMode.Open, System.IO.FileAccess.Read))
             {
                 BinaryReader reader = new BinaryReader(stream);
@@ -38,12 +39,12 @@ namespace PeParser
                 if (this.Is32BitHeader(fileHeader.FileHeader))
                 {
                     ImageOptionalHeader32 OptionalHeader32 = new ImageOptionalHeader32(FromBinaryReader<IMAGE_OPTIONAL_HEADER32>(reader));
-                    peFile = new PeFile(dosHeader, fileHeader, OptionalHeader32, null, filePath);
+                    peFile = new PeFileContext(dosHeader, fileHeader, OptionalHeader32, null, filePath);
                 }
                 else
                 {
                     ImageOptionalHeader64 OptionalHeader64 = new ImageOptionalHeader64(FromBinaryReader<IMAGE_OPTIONAL_HEADER64>(reader));
-                    peFile = new PeFile(dosHeader, fileHeader, null, OptionalHeader64, filePath);
+                    peFile = new PeFileContext(dosHeader, fileHeader, null, OptionalHeader64, filePath);
                 }
                 int numberOfSections = fileHeader.FileHeader.NumberOfSections;
 
