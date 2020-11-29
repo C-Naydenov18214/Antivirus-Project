@@ -66,11 +66,11 @@ namespace DeveloperKit.Context
             }
         }
 
-        public ImageSectionHeader[] ImageSectionHeaders
+        public IEnumerable<ImageSectionHeader>  ImageSectionHeaders
         {
             get
             {
-                return imageSectionHeaders.ToArray();
+                return imageSectionHeaders;
             }
         }
 

@@ -24,8 +24,6 @@ namespace Antivirus
         }
         public void Run(string[] args)
         {
-
-
             List<Task> tasks = ArrayToTasks(args);
 
             foreach (Task task in tasks)
@@ -36,7 +34,7 @@ namespace Antivirus
                 foreach (VirusInfo info in report.VirusInfos)
                 {
                     Console.WriteLine(info.FilePath);
-                    Console.WriteLine(info.Signature);
+
                     foreach (byte b in info.Signature)
                     {
                         if (n > 31)

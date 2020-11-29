@@ -40,9 +40,9 @@ namespace HashDll
 
             AntivirusReport report = new AntivirusReport();
             VirusInfo virusInfo = new VirusInfo();
-            virusInfo.addInfo("info 1", "lol");
-            virusInfo.addInfo("info 2", "kek");
-            virusInfo.addInfo("info 3", "cheburek");
+            virusInfo.addInfo("start", "0x0012f3");
+            virusInfo.addInfo("length", "105");
+            virusInfo.addInfo("status", "malicious");
             virusInfo.FilePath = fileContext.FileInfo.FullName;
             virusInfo.Signature = bytes;
             virusInfo.UrlToDataBase = "heh/gg/322";
