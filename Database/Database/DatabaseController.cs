@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
+using Dapper;
+using Dapper.Contrib.Extensions;
 
 namespace Database
 {
@@ -20,6 +22,7 @@ namespace Database
         /// <param name="path">path to SQLite table</param>
         public DatabaseController(string path)
         {
+            SqlMapper.AddTypeHandler(new DictionaryTypeHandler());
             connection = new SQLiteConnection();
             cmd        = new SQLiteCommand();
             this.path  = path;
@@ -32,7 +35,8 @@ namespace Database
         {
             if (!File.Exists(path))
             {
-                Console.WriteLine("Database not created.");
+                Console.WriteLine("Database not created. Please create it.");
+                return;
             }
 
             try
@@ -43,7 +47,7 @@ namespace Database
             }
             catch (SQLiteException e)
             {
-                Console.WriteLine("Got an exception: " + e.Message);
+                Console.WriteLine("Got an exception: {0}", e.Message);
             }
         }
 
@@ -55,70 +59,193 @@ namespace Database
             if (!File.Exists(path))
             {
                 SQLiteConnection.CreateFile(path);
+                Console.WriteLine("Database created!");
             }
 
             try
             {
                 connection = new SQLiteConnection("Data Source=" + path + ";Version = 3;");
                 connection.Open();
-                cmd.Connection  = connection;
-                cmd.CommandText = "create table if not exists viruses (signature text)";
+                cmd.Connection = connection;
+                cmd.CommandText =
+                    "create table if not exists viruses (id INTEGER PRIMARY KEY, virusType text, signature text, metadata text)";
                 cmd.ExecuteNonQuery();
             }
             catch (SQLiteException e)
             {
-                Console.WriteLine("Got an exception: " + e.Message);
+                Console.WriteLine("Got an exception: {0}", e.Message);
             }
         }
 
+        #region insert
         /// <summary>
-        /// Insert signature to the SQLite table.
+        /// Insert virus to the SQLite table.
         /// </summary>
         /// <param name="signature">virus signature</param>
-        public void Insert(string signature)
+        /// <param name="virus">virus</param>
+        /// <returns></returns>
+        public long Insert(Virus virus)
         {
-            cmd.CommandText = "insert into viruses (signature) values (@signature)";
-            cmd.Parameters.AddWithValue("@signature", signature);
-            cmd.Prepare();
-            cmd.ExecuteNonQuery();
-        }
-
-        /// <summary>
-        /// Delete signature from a SQLite table.
-        /// </summary>
-        /// <param name="signature">virus signature</param>
-        public void Delete(string signature)
-        {
-            cmd.CommandText = "delete from viruses where signature = @signature";
-            cmd.Parameters.AddWithValue("@signature", signature);
-            cmd.Prepare();
-            cmd.ExecuteNonQuery();
-        }
-
-        /// <summary>
-        /// Get signatures list from SQLite table.
-        /// </summary>
-        /// <returns>signatures list</returns>
-        public IEnumerable<string> GetSignatureList()
-        {
-            List<string> signatureList = new List<string>();
             try
             {
-                cmd.CommandText = @"select signature from viruses";
-                using SQLiteDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    signatureList.Add(Convert.ToString(reader["signature"]));
-                }
+                return connection.Insert(virus);
             }
             catch (SQLiteException e)
             {
-                Console.WriteLine("Got an exception: " + e.Message);
+                Console.Write("Got an exception: {0}", e.Message);
+                return -1;
             }
-
-            return signatureList;
         }
 
+        /// <summary>
+        /// Insert viruses list to the SQLite table.
+        /// </summary>
+        /// <param name="viruses">viruses</param>
+        /// <returns></returns>
+        public long InsertList(List<Virus> viruses)
+        {
+            try
+            {
+                return connection.Insert(viruses);
+            }
+            catch (SQLiteException e)
+            {
+                Console.Write("Got an exception: {0}", e.Message);
+                return -1;
+            }
+        }
+        #endregion
+
+        #region update
+        /// <summary>
+        /// Update specific virus in SQLite table.
+        /// </summary>
+        /// <param name="virus">virus</param>
+        /// <returns></returns>
+        public bool Update(Virus virus)
+        {
+            try
+            {
+                return connection.Update<Virus>(virus);
+            }
+            catch (SQLiteException e)
+            {
+                Console.Write("Got an exception: {0}", e.Message);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Update a list of viruses in SQLite table.
+        /// </summary>
+        /// <param name="viruses">viruses</param>
+        /// <returns></returns>
+        public bool UpdateList(List<Virus> viruses)
+        {
+            try
+            {
+                return SqlMapperExtensions.Update(connection, viruses);
+            }
+            catch (SQLiteException e)
+            {
+                Console.Write("Got an exception: {0}", e.Message);
+                return false;
+            }
+        }
+        #endregion
+        
+        #region delete
+        /// <summary>
+        /// Delete specific virus in SQLite table.
+        /// </summary>
+        /// <param name="virus">virus</param>
+        /// <returns></returns>
+        public bool Delete(Virus virus)
+        {
+            try
+            {
+                return connection.Delete(virus);
+            }
+            catch (SQLiteException e)
+            {
+                Console.Write("Got an exception: {0}", e.Message);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Delete viruses list in SQLite table.
+        /// </summary>
+        /// <param name="viruses">viruses</param>
+        /// <returns></returns>
+        public bool DeleteList(List<Virus> viruses)
+        {
+            try
+            {
+                return connection.Delete(viruses);
+            }
+            catch (SQLiteException e)
+            {
+                Console.Write("Got an exception: {0}", e.Message);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Delete all viruses in SQLite table.
+        /// </summary>
+        /// <returns></returns>
+        public bool DeleteAll()
+        {
+            try
+            {
+                return connection.DeleteAll<Virus>();
+            }
+            catch (SQLiteException e)
+            {
+                Console.Write("Got an exception: {0}", e.Message);
+                return false;
+            }
+        }
+        #endregion
+        
+        #region get
+        /// <summary>
+        /// Get specific virus by id.
+        /// </summary>
+        /// <param name="id">virus id</param>
+        /// <returns>virus</returns>
+        public Virus GetVirus(int id)
+        {
+            try
+            {
+                return connection.Get<Virus>(id);
+            }
+            catch (SQLiteException e)
+            {
+                Console.Write("Got an exception: {0}", e.Message);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Get all viruses list from SQLite table.
+        /// </summary>
+        /// <returns>signatures list</returns>
+        public IEnumerable<Virus> GetVirusesList()
+        {
+            try
+            {
+                return connection.GetAll<Virus>();
+            }
+            catch (SQLiteException e)
+            {
+                Console.Write("Got an exception: {0}", e.Message);
+                return null;
+            }
+        }
+        #endregion
+        
         /// <summary>
         /// Close connection to the SQLite table. 
         /// </summary>
