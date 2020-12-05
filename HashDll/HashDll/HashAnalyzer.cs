@@ -33,7 +33,6 @@ namespace HashDll
             {
                 foreach (ImageSectionHeader header in res)
                 {
-
                     Console.Write("section " + new string(header.SectionHeader.Name) + "\n");
                 }
             }
@@ -41,7 +40,7 @@ namespace HashDll
             AntivirusReport report = new AntivirusReport();
             VirusInfo virusInfo = new VirusInfo();
             virusInfo.addInfo("start", "0x0012f3");
-            virusInfo.addInfo("length", "105");
+            virusInfo.addInfo("length", 105);
             virusInfo.addInfo("status", "malicious");
             virusInfo.FilePath = fileContext.FileInfo.FullName;
             virusInfo.Signature = bytes;

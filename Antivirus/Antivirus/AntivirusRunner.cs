@@ -3,11 +3,13 @@ using DeveloperKit.Context;
 using DeveloperKit.PeReader;
 using DeveloperKit.Report;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Antivirus
@@ -16,45 +18,35 @@ namespace Antivirus
     {
         private string dllInterface = "IAnalyzer";
         private string interfaceMethod = "Analyze";
-        private Dictionary<string, FileContext> filesContext;
+        private ConcurrentDictionary<string, FileContext> filesContext;
+        private ConcurrentQueue<AntivirusReport> reports;
 
         public AntivirusRunner()
         {
-            this.filesContext = new Dictionary<string, FileContext>();
+            this.filesContext = new ConcurrentDictionary<string, FileContext>();
         }
         public void Run(string[] args)
         {
             List<Task> tasks = ArrayToTasks(args);
-
+            ManualResetEvent[] handles = new ManualResetEvent[tasks.Count];
+            reports = new ConcurrentQueue<AntivirusReport>();
+            for (int i = 0; i < tasks.Count; i++)
+            {
+                handles[i] = new ManualResetEvent(false);
+            }
+            int m = 0;
             foreach (Task task in tasks)
             {
-                int n = 0; 
-                AntivirusReport report = StartSearch(task);
 
-                foreach (VirusInfo info in report.VirusInfos)
+                ThreadPool.QueueUserWorkItem(new WaitCallback(x =>
                 {
-                    Console.WriteLine(info.FilePath);
-
-                    foreach (byte b in info.Signature)
-                    {
-                        if (n > 31)
-                        {
-                            Console.WriteLine();
-                            n = 0;
-                        }
-                        Console.Write(b.ToString("X2") + " ");
-                        n++;
-                    }
-                    Console.WriteLine();
-                    Console.WriteLine(info.UrlToDataBase);
-                    foreach (KeyValuePair<string, string> pair in info.Inforamation)
-                    {
-                        Console.WriteLine($"{pair.Key} {pair.Value}");
-                    }
-                }
+                    reports.Enqueue(StartSearch(task));
+                    handles[m++].Set();
+                }));
             }
-
-
+            WaitHandle.WaitAll(handles);
+            Reporter reporter = new Reporter();
+            reporter.ShowResult(reports);
         }
 
         private List<Task> ArrayToTasks(string[] args)
@@ -71,6 +63,8 @@ namespace Antivirus
 
         private AntivirusReport StartSearch(Task task)
         {
+
+
             AssemblyLoader loader = new AssemblyLoader();
             TypeFinder finder = new TypeFinder();
             Antivirus antivirus = new Antivirus();
@@ -80,18 +74,21 @@ namespace Antivirus
             Assembly asm = loader.LoadAssambly(task.GetAnalyzerPath());
             Type type = finder.FindType(asm, this.dllInterface);
             FileContext fileContext;
-
-            if (!filesContext.ContainsKey(target))
+            lock (filesContext)
             {
-                PeFileContext context = reader.ReadPeFile(target);
-                FileInfo fileInfo = new FileInfo(target);
-                fileContext = new FileContext(fileInfo, context);
-                filesContext.Add(target, fileContext);
-            }
-            else
-            {
-                filesContext.TryGetValue(target, out fileContext);
-                Console.WriteLine($"Same file {fileContext.FileInfo.FullName}");
+                if (!filesContext.ContainsKey(target))
+                {
+                    Console.WriteLine($"new item {target}");
+                    PeFileContext peFile = reader.ReadPeFile(target);
+                    FileInfo fileInfo = new FileInfo(target);
+                    fileContext = new FileContext(fileInfo, peFile);
+                    filesContext.TryAdd(target, fileContext);
+                }
+                else
+                {
+                    filesContext.TryGetValue(target, out fileContext);
+                    Console.WriteLine($"Same file {fileContext.FileInfo.FullName}");
+                }
             }
 
             var instance = Activator.CreateInstance(type);

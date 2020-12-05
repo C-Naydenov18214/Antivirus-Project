@@ -8,14 +8,14 @@ namespace DeveloperKit.Report
 {
     public class VirusInfo
     {
-        private Dictionary<string, string> information;
+        private Dictionary<string, object> information;
         private string urlToDataBase;
         private string filePath;
         private byte[] signature;
 
         public VirusInfo()
         {
-            information = new Dictionary<string, string>();
+            information = new Dictionary<string, object>();
 
         }
 
@@ -25,14 +25,14 @@ namespace DeveloperKit.Report
 
         public string FilePath { get { return filePath; } set { filePath = value; } }
 
-        public IDictionary<string, string> Inforamation
+        public IDictionary<string, object> Inforamation
         {
             get
             {
                 return information;
             }
         }
-        public void addInfo(string key, string value)
+        public void addInfo(string key, object value)
         {
             information.Add(key, value);
         }

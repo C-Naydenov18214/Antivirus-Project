@@ -55,6 +55,7 @@
     <Compile Include="AntivirusRunner.cs" />
     <Compile Include="MainClass.cs" />
     <Compile Include="AssemblyLoader.cs" />
+    <Compile Include="Reporter.cs" />
     <Compile Include="Task.cs" />
     <Compile Include="TypeFinder.cs" />
   </ItemGroup>
