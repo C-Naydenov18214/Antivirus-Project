@@ -1,0 +1,21 @@
+﻿<Window x:Class="GUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GUI"
+        mc:Ignorable="d"
+        Title="Antivirus Software" Height="460" Width="810" WindowStyle="ThreeDBorderWindow" Background="#191919" ResizeMode="NoResize">
+    <Grid x:Name="Layout">
+        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="12" HorizontalAlignment="Left" Height="399" Margin="10,10,0,0" VerticalAlignment="Top" Width="772" Background="#323232"/>
+        <Button Content="Open files" HorizontalAlignment="Left" Margin="49,56,0,0" VerticalAlignment="Top" Width="106" Height="25" Click="buttonOpenFiles_Click" Background="#4c4c4c" Foreground="White"/>
+        <Button Content="Choose Analyzers" HorizontalAlignment="Left" Margin="49,106,0,0" VerticalAlignment="Top" Width="106" Height="25" Click="buttonChooseAnalyzers_Click" Background="#4c4c4c" Foreground="White"/>
+        <Button Content="Analyze" HorizontalAlignment="Left" Margin="49,156,0,0" VerticalAlignment="Top" Width="106" Height="25" Click="buttonAnalyze_Click" Background="#17ad97" Foreground="White"/>
+        <ListBox Name="FileName" Margin="194,56,368,238"></ListBox>
+        <ListBox Name="AnalyzerName" Margin="475,56,87,238"></ListBox>
+        <TextBlock Name="Report" HorizontalAlignment="Left" Margin="49,216,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="173" Width="656" Background="White"/>
+        <Label Content="Files" HorizontalAlignment="Left" Margin="194,30,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label Content="Analyzers" HorizontalAlignment="Left" Margin="475,30,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Label Content="Report" HorizontalAlignment="Left" Margin="49,190,0,0" VerticalAlignment="Top" Foreground="White"/>
+    </Grid>
+</Window>
