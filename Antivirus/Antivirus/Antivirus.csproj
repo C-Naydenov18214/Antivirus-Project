@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Antivirus.cs" />
     <Compile Include="AntivirusRunner.cs" />
+    <Compile Include="DirectoreManager.cs" />
     <Compile Include="MainClass.cs" />
     <Compile Include="AssemblyLoader.cs" />
     <Compile Include="Reporter.cs" />
@@ -75,6 +76,7 @@
     <Reference Include="DeveloperKit">
       <HintPath>..\..\PeParser\PeParser\bin\Debug\DeveloperKit.dll</HintPath>
     </Reference>
+    <Reference Include="System" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

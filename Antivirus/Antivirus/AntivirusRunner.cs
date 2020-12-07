@@ -28,6 +28,10 @@ namespace Antivirus
         public void Run(string[] args)
         {
             List<Task> tasks = ArrayToTasks(args);
+            /*foreach (Task t in tasks)
+            {
+                Console.WriteLine($"{t.GetTargetPath()}  {t.GetAnalyzerPath()}");
+            }*/
             ManualResetEvent[] handles = new ManualResetEvent[tasks.Count];
             reports = new ConcurrentQueue<AntivirusReport>();
             for (int i = 0; i < tasks.Count; i++)
@@ -37,12 +41,20 @@ namespace Antivirus
             int m = 0;
             foreach (Task task in tasks)
             {
-
-                ThreadPool.QueueUserWorkItem(new WaitCallback(x =>
+                string str = task.GetTargetPath();
+                if (str.EndsWith(".exe"))
                 {
-                    reports.Enqueue(StartSearch(task));
-                    handles[m++].Set();
-                }));
+                    //StartSearchInExe(task);
+                    ThreadPool.QueueUserWorkItem(new WaitCallback(x =>
+                    {
+                        reports.Enqueue(StartSearchInExe(task));
+                        handles[m++].Set();
+                    }));
+                }
+                else
+                { 
+                    Console.WriteLine($"Is not .exe --- {str}");
+                }
             }
             WaitHandle.WaitAll(handles);
             Reporter reporter = new Reporter();
@@ -51,20 +63,31 @@ namespace Antivirus
 
         private List<Task> ArrayToTasks(string[] args)
         {
+            DirectoreManager manager = new DirectoreManager();
             int length = args.Length;
             List<Task> tasks = new List<Task>(length / 2);
 
             for (int i = 0; i < length - 1; i += 2)
             {
-                tasks.Add(new Task(args[i], args[i + 1]));
+                string path = args[i];
+                if (manager.IsFile(path))
+                {
+                    tasks.Add(new Task(path, args[i + 1]));
+                }
+                else if (manager.IsDirectory(path))
+                {
+                    IEnumerable<string> files =  manager.GetFiles(path);
+                    foreach (string f in files) 
+                    {
+                        tasks.Add(new Task(f, args[i + 1]));
+                    }
+                }
             }
             return tasks;
         }
 
-        private AntivirusReport StartSearch(Task task)
+        private AntivirusReport StartSearchInExe(Task task)
         {
-
-
             AssemblyLoader loader = new AssemblyLoader();
             TypeFinder finder = new TypeFinder();
             Antivirus antivirus = new Antivirus();
@@ -95,6 +118,11 @@ namespace Antivirus
             MethodInfo analyze = type.GetMethod(this.interfaceMethod);
 
             return antivirus.CheckFile(instance, analyze, fileContext);
+        }
+
+        private AntivirusReport StartSearchInFile(Task task)
+        {
+            return new AntivirusReport();
         }
     }
 }

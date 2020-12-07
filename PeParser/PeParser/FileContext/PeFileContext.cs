@@ -93,7 +93,7 @@ namespace DeveloperKit.Context
                     return section;
                 }
             }
-            throw new Exception("No such section");
+            throw new Exception($"No such section --- {name}");
         }
     }
 }

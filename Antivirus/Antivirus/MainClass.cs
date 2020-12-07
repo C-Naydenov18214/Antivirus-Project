@@ -20,13 +20,13 @@ namespace Antivirus
             }*/
 
             //TEST
-            args = new string[6];
-            args[0] = @"D:\Visaul studio prejects\MalwareTests\HW\testAddSec.exe";
+            args = new string[2];
+            args[0] = @"D:\Visaul studio prejects\MalwareTests\HW";
             args[1] = @"D:\Visaul studio prejects\Antivirus-Project\HashDll\HashDll\bin\Debug\HashDll.dll";
-            args[2] = @"D:\Visaul studio prejects\MalwareTests\HW\testAddSec.exe";
-            args[3] = @"D:\Visaul studio prejects\Antivirus-Project\HashDll\HashDll\bin\Debug\HashDll.dll";
-            args[4] = @"D:\Visaul studio prejects\MalwareTests\HW\testAddSec.exe";
-            args[5] = @"D:\Visaul studio prejects\Antivirus-Project\HashDll\HashDll\bin\Debug\HashDll.dll";
+            /*args[2] = @"D:\Visaul studio prejects\С# projects\Task\Task\bin\Debug\Task.exe";
+            args[3] = @"D:\Visaul studio prejects\Antivirus-Project\HashDll\HashDll\bin\Debug\HashDll.dll";*/
+            /*args[4] = @"D:\Visaul studio prejects\MalwareTests\HW\testAddSec.exe";
+            args[5] = @"D:\Visaul studio prejects\Antivirus-Project\HashDll\HashDll\bin\Debug\HashDll.dll";*/
             /*args[6] = @"D:\Visaul studio prejects\MalwareTests\HW\testAddSec.exe";
             args[7] = @"D:\Visaul studio prejects\Antivirus-Project\HashDll\HashDll\bin\Debug\HashDll.dll";
             args[8] = @"D:\Visaul studio prejects\MalwareTests\HW\testAddSec.exe";

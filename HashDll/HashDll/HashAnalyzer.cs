@@ -17,13 +17,21 @@ namespace HashDll
 
         public AntivirusReport Analyze(FileContext fileContext)
         {
+            byte[] bytes = null;
             PeFileContext context = fileContext.PeInfo;
             foreach (ImageSectionHeader header in context.ImageSectionHeaders)
             {
                 Console.WriteLine(header.SectionHeader.Name);
             }
-
-            byte[] bytes = context.GetSection(".virus").SectionBytes;
+            try
+            {
+                ImageSectionHeader header = context.GetSection(".virus");
+                bytes = header.SectionBytes;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
             int n = 0;
             
             Console.WriteLine();
