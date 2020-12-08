@@ -11,7 +11,7 @@ namespace DeveloperKit.PeReader
     public class Searcher
     {
 
-        public ImageSectionHeader[] FindHeaderWithChar(PeFileContext pe, params DataSectionFlags[] characteristic)
+        public ImageSectionHeader[] FindHeaderWithCharacteritic(PeFileContext pe, params DataSectionFlags[] characteristic)
         {
             List<ImageSectionHeader> results = new List<ImageSectionHeader>();
             

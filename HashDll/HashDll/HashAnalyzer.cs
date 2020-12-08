@@ -18,10 +18,12 @@ namespace HashDll
         public AntivirusReport Analyze(FileContext fileContext)
         {
             byte[] bytes = null;
+            AntivirusReport report = new AntivirusReport();
+            VirusInfo virusInfo = new VirusInfo();
             PeFileContext context = fileContext.PeInfo;
             foreach (ImageSectionHeader header in context.ImageSectionHeaders)
             {
-                Console.WriteLine(header.SectionHeader.Name);
+                virusInfo.addInfo("Section", new string(header.SectionHeader.Name));
             }
             try
             {
@@ -30,29 +32,21 @@ namespace HashDll
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                virusInfo.addInfo("NO such section", ".virus");
             }
-            int n = 0;
-            
-            Console.WriteLine();
+            int n = 0; 
             Searcher searcher = new Searcher();
-            var res = searcher.FindHeaderWithChar(context);
+            var res = searcher.FindHeaderWithCharacteritic(context,Structures.DataSectionFlags.ContentCode, Structures.DataSectionFlags.MemoryExecute);
             if (res != null)
             {
                 foreach (ImageSectionHeader header in res)
                 {
-                    Console.Write("section " + new string(header.SectionHeader.Name) + "\n");
+                    virusInfo.addInfo("Sections with characteritic: ContentCode, MemoryExecute", new string(header.SectionHeader.Name));
                 }
             }
-
-            AntivirusReport report = new AntivirusReport();
-            VirusInfo virusInfo = new VirusInfo();
-            virusInfo.addInfo("start", "0x0012f3");
-            virusInfo.addInfo("length", 105);
-            virusInfo.addInfo("status", "malicious");
             virusInfo.FilePath = fileContext.FileInfo.FullName;
             virusInfo.Signature = bytes;
-            virusInfo.UrlToDataBase = "heh/gg/322";
+            virusInfo.UrlToDataBase = "https://vms.drweb.ru/search/";
             report.addVirusInfo(virusInfo);
             return report;
         }

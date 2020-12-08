@@ -28,36 +28,34 @@ namespace Antivirus
         public void Run(string[] args)
         {
             List<Task> tasks = ArrayToTasks(args);
-            /*foreach (Task t in tasks)
-            {
-                Console.WriteLine($"{t.GetTargetPath()}  {t.GetAnalyzerPath()}");
-            }*/
             ManualResetEvent[] handles = new ManualResetEvent[tasks.Count];
+            Reporter reporter = new Reporter();
             reports = new ConcurrentQueue<AntivirusReport>();
             for (int i = 0; i < tasks.Count; i++)
             {
                 handles[i] = new ManualResetEvent(false);
             }
             int m = 0;
+            int number = tasks.Count;
+            Console.WriteLine($"Number of tasks - { number}");
             foreach (Task task in tasks)
             {
                 string str = task.GetTargetPath();
                 if (str.EndsWith(".exe"))
                 {
-                    //StartSearchInExe(task);
                     ThreadPool.QueueUserWorkItem(new WaitCallback(x =>
                     {
                         reports.Enqueue(StartSearchInExe(task));
                         handles[m++].Set();
+                        Console.WriteLine($"Task {task.GetTargetPath() } finished");
                     }));
                 }
-                else
+                /*else
                 { 
                     Console.WriteLine($"Is not .exe --- {str}");
-                }
+                }*/
             }
             WaitHandle.WaitAll(handles);
-            Reporter reporter = new Reporter();
             reporter.ShowResult(reports);
         }
 
@@ -70,7 +68,7 @@ namespace Antivirus
             for (int i = 0; i < length - 1; i += 2)
             {
                 string path = args[i];
-                if (manager.IsFile(path))
+                if (manager.IsFile(path) && path.EndsWith(".exe"))
                 {
                     tasks.Add(new Task(path, args[i + 1]));
                 }
@@ -79,7 +77,10 @@ namespace Antivirus
                     IEnumerable<string> files =  manager.GetFiles(path);
                     foreach (string f in files) 
                     {
-                        tasks.Add(new Task(f, args[i + 1]));
+                        if (manager.IsFile(f) && f.EndsWith(".exe"))
+                        {
+                            tasks.Add(new Task(f, args[i + 1]));
+                        }
                     }
                 }
             }
@@ -101,7 +102,7 @@ namespace Antivirus
             {
                 if (!filesContext.ContainsKey(target))
                 {
-                    Console.WriteLine($"new item {target}");
+                    //Console.WriteLine($"new item {target}");
                     PeFileContext peFile = reader.ReadPeFile(target);
                     FileInfo fileInfo = new FileInfo(target);
                     fileContext = new FileContext(fileInfo, peFile);
@@ -110,7 +111,7 @@ namespace Antivirus
                 else
                 {
                     filesContext.TryGetValue(target, out fileContext);
-                    Console.WriteLine($"Same file {fileContext.FileInfo.FullName}");
+                    //Console.WriteLine($"Same file {fileContext.FileInfo.FullName}");
                 }
             }
 

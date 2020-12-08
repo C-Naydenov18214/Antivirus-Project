@@ -15,27 +15,34 @@ namespace Antivirus
             int n = 0;
             foreach (AntivirusReport report in reports)
             {
+
                 foreach (VirusInfo info in report.VirusInfos)
                 {
-                    Console.WriteLine(info.FilePath);
-
-                    foreach (byte b in info.Signature)
+                    Console.WriteLine($"File name - {info.FilePath}");
+                    Console.WriteLine($"Signature: ");
+                    if (info.Signature != null)
                     {
-                        if (n > 31)
+                        foreach (byte b in info.Signature)
                         {
-                            Console.WriteLine();
-                            n = 0;
+                            if (n > 31)
+                            {
+                                Console.WriteLine();
+                                n = 0;
+                            }
+                            Console.Write(b.ToString("X2") + " ");
+                            n++;
                         }
-                        Console.Write(b.ToString("X2") + " ");
-                        n++;
                     }
                     Console.WriteLine();
-                    Console.WriteLine(info.UrlToDataBase);
+                    Console.WriteLine($"URL to database: {info.UrlToDataBase}");
+                    Console.WriteLine("Information from analyzer: ");
                     foreach (KeyValuePair<string, object> pair in info.Inforamation)
                     {
                         Console.WriteLine($"{pair.Key} {pair.Value}");
                     }
+                    Console.WriteLine("----------------------------------------------------------------");
                 }
+                Console.WriteLine("============================================");
             }
 
         }
