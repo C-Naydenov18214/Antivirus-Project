@@ -49,7 +49,7 @@ namespace HashDll
             virusInfo.UrlToDataBase = "https://vms.drweb.ru/search/";
             string path = Directory.GetCurrentDirectory();
             DatabaseController database = new DatabaseController(path + "\\Viruses.sqlite");
-            database.Connect();
+            database.Create();
             database.Insert(new Virus(virusInfo));
             database.CloseConnection();
             report.addVirusInfo(virusInfo);
