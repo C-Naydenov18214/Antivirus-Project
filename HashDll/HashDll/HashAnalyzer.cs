@@ -1,4 +1,4 @@
-﻿
+﻿using Database;
 using DeveloperKit.Analyzer;
 using DeveloperKit.Context;
 using DeveloperKit.PeReader;
@@ -41,12 +41,17 @@ namespace HashDll
             {
                 foreach (ImageSectionHeader header in res)
                 {
-                    virusInfo.addInfo("Sections with characteritic: ContentCode, MemoryExecute", new string(header.SectionHeader.Name));
+                    virusInfo.addInfo("Sections with characteristic: ContentCode, MemoryExecute", new string(header.SectionHeader.Name));
                 }
             }
             virusInfo.FilePath = fileContext.FileInfo.FullName;
             virusInfo.Signature = bytes;
             virusInfo.UrlToDataBase = "https://vms.drweb.ru/search/";
+            string path = Directory.GetCurrentDirectory();
+            DatabaseController database = new DatabaseController(path + "\\Viruses.sqlite");
+            database.Connect();
+            database.Insert(new Virus(virusInfo));
+            database.CloseConnection();
             report.addVirusInfo(virusInfo);
             return report;
         }

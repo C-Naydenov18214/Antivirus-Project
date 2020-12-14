@@ -34,6 +34,9 @@
     <Reference Include="DeveloperKit">
       <HintPath>..\..\PeParser\PeParser\bin\Debug\DeveloperKit.dll</HintPath>
     </Reference>
+    <Reference Include="Database">
+      <HintPath>..\..\Database\Database\bin\Debug\Database.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

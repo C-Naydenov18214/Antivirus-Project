@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+using Dapper.Contrib.Extensions;
+using DeveloperKit.Report;
 
 namespace Database
 {
@@ -16,5 +18,15 @@ namespace Database
         public string Signature { get; set; }
         
         public Dictionary<string, object> Metadata { get; set; }
+
+        public Virus(VirusInfo virusInfo)
+        {
+            VirusType = "unknown";
+            Signature = BitConverter.ToString(virusInfo.Signature);
+            foreach (var el in virusInfo.Inforamation)
+            {
+                Metadata.Add(el.Key, el.Value);
+            }
+        }
     }
 }
