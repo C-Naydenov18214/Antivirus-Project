@@ -85,7 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DatabaseController.cs" />
-    <Compile Include="DictionaryTypeHandler.cs" />
+    <Compile Include="ListTypeHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Virus.cs" />
   </ItemGroup>

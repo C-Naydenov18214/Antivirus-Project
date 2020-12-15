@@ -9,9 +9,9 @@ namespace Database
     /// <summary>
     /// Used in order to help Dapper parse Dictionary class.
     /// </summary>
-    class DictionaryTypeHandler : SqlMapper.TypeHandler<Dictionary<string, object>>
+    class ListTypeHandler : SqlMapper.TypeHandler<List<KeyValuePair<string, object>>>
     {
-        public override void SetValue(IDbDataParameter parameter, Dictionary<string, object> value)
+        public override void SetValue(IDbDataParameter parameter, List<KeyValuePair<string, object>> value)
         {
             parameter.Value = (value == null)
                 ? (object)DBNull.Value
@@ -19,9 +19,9 @@ namespace Database
             parameter.DbType = DbType.String;
         }
 
-        public override Dictionary<string, object> Parse(object value)
+        public override List<KeyValuePair<string, object>> Parse(object value)
         {
-            return JsonConvert.DeserializeObject<Dictionary<string, object>>(value.ToString());
+            return JsonConvert.DeserializeObject<List<KeyValuePair<string, object>>>(value.ToString());
         }
     }
 }

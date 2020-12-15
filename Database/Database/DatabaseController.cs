@@ -22,7 +22,7 @@ namespace Database
         /// <param name="path">path to SQLite table</param>
         public DatabaseController(string path)
         {
-            SqlMapper.AddTypeHandler(new DictionaryTypeHandler());
+            SqlMapper.AddTypeHandler(new ListTypeHandler());
             connection = new SQLiteConnection();
             cmd        = new SQLiteCommand();
             this.path  = path;

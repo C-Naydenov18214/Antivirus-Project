@@ -17,16 +17,23 @@ namespace Database
         
         public string Signature { get; set; }   
         
-        public Dictionary<string, object> Metadata { get; set; }
+        public List<KeyValuePair<string, object>> Metadata { get; set; }
 
         public Virus(VirusInfo virusInfo)
         {
-            Metadata = new Dictionary<string, object>();
+            Metadata = new List<KeyValuePair<string, object>>();
             VirusType = "unknown";
             Signature = BitConverter.ToString(virusInfo.Signature);
-            foreach (var el in virusInfo.Inforamation)
+            try
             {
-                Metadata.Add(el.Key, el.Value);
+                foreach (var el in virusInfo.Inforamation)
+                {
+                    Metadata.Add(el);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.Write("Got an exception {0}",e);
             }
         }
     }
