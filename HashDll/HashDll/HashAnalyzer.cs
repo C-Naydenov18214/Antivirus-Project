@@ -1,4 +1,5 @@
-﻿using Database;
+﻿
+using Database;
 using DeveloperKit.Analyzer;
 using DeveloperKit.Context;
 using DeveloperKit.PeReader;
