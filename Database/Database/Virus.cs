@@ -15,12 +15,13 @@ namespace Database
         
         public string VirusType { get; set; }
         
-        public string Signature { get; set; }
+        public string Signature { get; set; }   
         
         public Dictionary<string, object> Metadata { get; set; }
 
         public Virus(VirusInfo virusInfo)
         {
+            Metadata = new Dictionary<string, object>();
             VirusType = "unknown";
             Signature = BitConverter.ToString(virusInfo.Signature);
             foreach (var el in virusInfo.Inforamation)
