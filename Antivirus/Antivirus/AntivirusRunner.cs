@@ -40,6 +40,7 @@ namespace Antivirus
             Console.WriteLine($"Number of tasks - { number}");
             foreach (Task task in tasks)
             {
+                //StartSearchInExe(task);
                 string str = task.GetTargetPath();
                 if (str.EndsWith(".exe"))
                 {

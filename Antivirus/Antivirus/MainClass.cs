@@ -21,7 +21,7 @@ namespace Antivirus
 
             //TEST
             /*args = new string[2];
-            args[0] = @"D:\Visaul studio prejects\MalwareTests\HW";
+            args[0] = @"D:\Visaul studio prejects\MalwareTests\HW\tests";
             args[1] = @"D:\Visaul studio prejects\Antivirus-Project\HashDll\HashDll\bin\Debug\HashDll.dll";*/
             /*args[2] = @"D:\Visaul studio prejects\Antivirus-Project\Antivirus\Antivirus\bin\Release\Antivirus.exe";
             args[3] = @"D:\Visaul studio prejects\Antivirus-Project\HashDll\HashDll\bin\Debug\HashDll.dll";*/
