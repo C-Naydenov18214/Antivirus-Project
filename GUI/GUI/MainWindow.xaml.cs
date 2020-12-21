@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
+using DeveloperKit;
 
 namespace GUI
 {
@@ -22,13 +23,17 @@ namespace GUI
     public partial class MainWindow : Window
     {
         private List<string> fileNames;
+        private List<string> filePaths;
         private List<string> dllNames;
+        private List<string> dllPaths;
 
         public MainWindow()
         {
             InitializeComponent();
             fileNames = new List<string>();
+            filePaths = new List<string>();
             dllNames = new List<string>();
+            dllPaths = new List<string>();
         }
 
         /// <summary>
@@ -53,6 +58,7 @@ namespace GUI
                 foreach (string filename in dlg.FileNames)
                 {
                     fileNames.Add(System.IO.Path.GetFileName(filename));
+                    filePaths.Add(filename);
                     FileName.Items.Add(System.IO.Path.GetFileName(filename));
                 }
             }
@@ -81,6 +87,7 @@ namespace GUI
                 foreach (string filename in dlg.FileNames)
                 {
                     dllNames.Add(System.IO.Path.GetFileName(filename));
+                    dllPaths.Add(filename);
                     AnalyzerName.Items.Add(System.IO.Path.GetFileName(filename));
                 }
             }
@@ -94,12 +101,30 @@ namespace GUI
         {
             if (fileNames.Count == 0 || dllNames.Count == 0)
             {
-                Report.Text = "Please choose executables and dll";
+                Report.Text += "Please choose executables and dll\n";
                 return;
             }
 
             // Start analyzing:
             // ...
+            int len = fileNames.Count + dllNames.Count;
+            if (len < 2 || len % 2 != 0)
+            {
+                Report.Text += "Not enough arguments: couples required <filepath> <dllpath> ...";
+                return;
+            }
+            string[] args = new string[len];
+            int j = 0;
+            for (int i = 0; i < len; i += 2)
+            {
+                args[i] = filePaths[j];
+                args[i + 1] = dllPaths[j];
+                j++;
+            }
+            //args[0] = @"C:\Users\jlemi\Downloads\FixMouseLMB.exe";
+            //args[1] = @"C:\Users\jlemi\Documents\GitHub\Antivirus-Project\HashDll\HashDll\bin\Debug\HashDll.dll";
+            AntivirusRunner antivirusRunner = new AntivirusRunner(Report);
+            antivirusRunner.Run(args);
         }
     }
 }

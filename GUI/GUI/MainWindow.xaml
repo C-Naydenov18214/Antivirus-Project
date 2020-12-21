@@ -13,7 +13,13 @@
         <Button Content="Analyze" HorizontalAlignment="Left" Margin="49,156,0,0" VerticalAlignment="Top" Width="106" Height="25" Click="buttonAnalyze_Click" Background="#17ad97" Foreground="White"/>
         <ListBox Name="FileName" Margin="194,56,368,238"></ListBox>
         <ListBox Name="AnalyzerName" Margin="475,56,87,238"></ListBox>
-        <TextBlock Name="Report" HorizontalAlignment="Left" Margin="49,216,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="173" Width="656" Background="White"/>
+        <ScrollViewer Height="173"
+                      Background="White"
+                      HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto" Margin="49,221,87,43">
+            <TextBlock Name="Report" HorizontalAlignment="Left" TextWrapping="WrapWithOverflow" Text="" VerticalAlignment="Top" Background="White"/>
+        </ScrollViewer>
+
         <Label Content="Files" HorizontalAlignment="Left" Margin="194,30,0,0" VerticalAlignment="Top" Foreground="White"/>
         <Label Content="Analyzers" HorizontalAlignment="Left" Margin="475,30,0,0" VerticalAlignment="Top" Foreground="White"/>
         <Label Content="Report" HorizontalAlignment="Left" Margin="49,190,0,0" VerticalAlignment="Top" Foreground="White"/>
