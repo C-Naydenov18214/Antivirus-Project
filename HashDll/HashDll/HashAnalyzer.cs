@@ -20,9 +20,6 @@ namespace HashDll
             string path = Directory.GetCurrentDirectory();
             DatabaseController database = new DatabaseController(path + "\\Viruses.sqlite");
             database.Connect();
-            database.Delete(database.GetVirus(1));
-            //database.Delete(database.GetVirus(2));
-            //database.Delete(database.GetVirus(2));
             AntivirusReport report = new AntivirusReport();
             IEnumerable<Virus> viruses = database.GetVirusesList();// { 96, 97, 104, 241, 18, 64, 0, 195, 204, 204, 204, 204, 204, 204, 204, 204 };//Сигнатура из базы данных
             foreach (Virus v in viruses)
@@ -42,7 +39,7 @@ namespace HashDll
                     bool isContain = IsContain(header.SectionBytes, virusBody);
                     if (isContain)
                     {
-                        virusInfo.addInfo($"WARNING: Section: {new string(header.SectionHeader.Name)} contaions virus body", "OUR VIRUS");
+                        virusInfo.addInfo($"WARNING: Section: {new string(header.SectionHeader.Name)} contaions virus body", $"Virus ID: {v.Id}");
                     }
                     else
                     {
