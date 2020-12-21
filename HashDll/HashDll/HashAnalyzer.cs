@@ -17,51 +17,59 @@ namespace HashDll
 
         public AntivirusReport Analyze(FileContext fileContext)
         {
-            byte[] bytes = new byte[0];
-            byte[] virusBody = { 96, 97, 104, 241, 18, 64, 0, 195, 204, 204, 204, 204, 204, 204, 204, 204 };//Сигнатура из базы данных
-            AntivirusReport report = new AntivirusReport();
-            VirusInfo virusInfo = new VirusInfo();
-            PeFileContext context = fileContext.PeInfo;
-            foreach (ImageSectionHeader header in context.ImageSectionHeaders)
-            {
-                bool isContain = IsContain(header.SectionBytes, virusBody);
-                if (isContain)
-                {
-                    virusInfo.addInfo($"WARNING: Section: {new string(header.SectionHeader.Name)} contaions virus body", "OUR VIRUS");
-                }
-                else
-                {
-                    virusInfo.addInfo($"Section: {new string(header.SectionHeader.Name)} is ", "cleare");
-                }
-            }
-            try
-            {
-                ImageSectionHeader header = context.GetSection(".virus");
-                bytes = header.SectionBytes;
-            }
-            catch (Exception e)
-            {
-                virusInfo.addInfo("NO such section", ".virus");
-            }
-            int n = 0;
-            Searcher searcher = new Searcher();
-            var res = searcher.FindHeaderWithCharacteritic(context, Structures.DataSectionFlags.ContentCode, Structures.DataSectionFlags.MemoryExecute);
-            if (res != null)
-            {
-                foreach (ImageSectionHeader header in res)
-                {
-                    virusInfo.addInfo("Sections with characteristic: ContentCode, MemoryExecute", new string(header.SectionHeader.Name));
-                }
-            }
-            virusInfo.FilePath = fileContext.FileInfo.FullName;
-            virusInfo.Signature = bytes;
-            virusInfo.UrlToDataBase = "https://vms.drweb.ru/search/";
             string path = Directory.GetCurrentDirectory();
             DatabaseController database = new DatabaseController(path + "\\Viruses.sqlite");
-            database.Create();
-            database.Insert(new Virus(virusInfo));
-            database.CloseConnection();
-            report.addVirusInfo(virusInfo);
+            database.Connect();
+            database.Delete(database.GetVirus(1));
+            //database.Delete(database.GetVirus(2));
+            //database.Delete(database.GetVirus(2));
+            AntivirusReport report = new AntivirusReport();
+            IEnumerable<Virus> viruses = database.GetVirusesList();// { 96, 97, 104, 241, 18, 64, 0, 195, 204, 204, 204, 204, 204, 204, 204, 204 };//Сигнатура из базы данных
+            foreach (Virus v in viruses)
+            {
+                string[] str = v.Signature.Split('-');
+                byte[] virusBody = new byte[str.Length];
+
+                for (int i = 0; i < str.Length; i++)
+                {
+                    virusBody[i] = Convert.ToByte(str[i], 16);
+                }
+
+                VirusInfo virusInfo = new VirusInfo();
+                PeFileContext context = fileContext.PeInfo;
+                foreach (ImageSectionHeader header in context.ImageSectionHeaders)
+                {
+                    bool isContain = IsContain(header.SectionBytes, virusBody);
+                    if (isContain)
+                    {
+                        virusInfo.addInfo($"WARNING: Section: {new string(header.SectionHeader.Name)} contaions virus body", "OUR VIRUS");
+                    }
+                    else
+                    {
+                        virusInfo.addInfo($"Section: {new string(header.SectionHeader.Name)} is ", "cleare");
+                    }
+                }
+                try
+                {
+                    ImageSectionHeader header = context.GetSection(".virus");
+                }
+                catch (Exception e)
+                {
+                    virusInfo.addInfo("NO such section", ".virus");
+                }
+                Searcher searcher = new Searcher();
+                var res = searcher.FindHeaderWithCharacteritic(context, Structures.DataSectionFlags.ContentCode, Structures.DataSectionFlags.MemoryExecute);
+                if (res != null)
+                {
+                    foreach (ImageSectionHeader header in res)
+                    {
+                        virusInfo.addInfo("Sections with characteristic: ContentCode, MemoryExecute", new string(header.SectionHeader.Name));
+                    }
+                }
+                virusInfo.FilePath = fileContext.FileInfo.FullName;
+                virusInfo.Signature = virusBody;
+                report.addVirusInfo(virusInfo);
+            }
             return report;
         }
 
