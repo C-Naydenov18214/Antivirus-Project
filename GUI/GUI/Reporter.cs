@@ -39,7 +39,7 @@ namespace GUI
                                 n = 0;
                             }
 
-                            reportB.Text += b.ToString("X2") + " " + '\n';
+                            reportB.Text += b.ToString("X2") + " ";
                             //Console.Write(b.ToString("X2") + " ");
                             n++;
                         }
