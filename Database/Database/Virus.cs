@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Dapper.Contrib.Extensions;
 using DeveloperKit.Report;
+using Newtonsoft.Json;
 
 namespace Database
 {
@@ -18,6 +19,16 @@ namespace Database
         public string Signature { get; set; }   
         
         public List<KeyValuePair<string, object>> Metadata { get; set; }
+
+        public Virus() {}
+
+        public Virus(int id, string virusType, string signature, string metadata)
+        {
+            this.Id = id;
+            this.VirusType = virusType;
+            this.Signature = signature;
+            this.Metadata = JsonConvert.DeserializeObject<List<KeyValuePair<string, object>>>(metadata.ToString());
+        }
 
         public Virus(VirusInfo virusInfo)
         {
