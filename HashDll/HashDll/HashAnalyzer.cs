@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace HashDll
 {
-    public class HashAnalyzer : IAnalyzer
+    public class HashAnalyzer :  MarshalByRefObject, IAnalyzer
     {
 
         public AntivirusReport Analyze(FileContext fileContext)

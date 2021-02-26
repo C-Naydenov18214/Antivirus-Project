@@ -37,7 +37,6 @@ namespace Antivirus
                 Console.WriteLine("Not enought arguments: couples required <filepath> <dllpath> ...");
                 return;
             }
-
             AntivirusRunner runner = new AntivirusRunner();
             runner.Run(args);
         }

@@ -1,4 +1,5 @@
 ﻿
+using DeveloperKit.Analyzer;
 using DeveloperKit.Context;
 using DeveloperKit.PeReader;
 using DeveloperKit.Report;
@@ -115,7 +116,7 @@ namespace Antivirus
                     //Console.WriteLine($"Same file {fileContext.FileInfo.FullName}");
                 }
             }
-
+            
             var instance = Activator.CreateInstance(type);
             MethodInfo analyze = type.GetMethod(this.interfaceMethod);
 
