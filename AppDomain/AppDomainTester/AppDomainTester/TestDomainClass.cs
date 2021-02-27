@@ -39,9 +39,31 @@ namespace AppDomainTester
                 );
             // Call a method on the object via the proxy, passing the
             // default AppDomain's friendly name in as a parameter.
-            mbrt.TestMethod(callingDomainName);
+            Console.WriteLine($"Total Allocated Memory Size befor run app = {ad2.MonitoringTotalAllocatedMemorySize}");
+            long curAllocatedMemory = ad2.MonitoringSurvivedMemorySize;
+            Thread thread = new Thread(new ThreadStart(mbrt.TestMethod));
+            thread.Start();
+            long tmp;
+            while(true)
+            {
+                Thread.Sleep(100);
+                tmp = ad2.MonitoringTotalAllocatedMemorySize;
+                if (tmp > 42000)
+                {
+                    Console.WriteLine($"Current Allocated Memory Size Of App = {tmp}");
+                    break;
+                }
+                if (tmp > curAllocatedMemory)
+                {
+                    curAllocatedMemory = tmp;
+                }
+                Console.WriteLine($"Current Allocated Memory Size Of App = {curAllocatedMemory}");
+            }
+            Console.WriteLine($"Total Allocated Memory Size  Of App = {ad2.MonitoringTotalAllocatedMemorySize}");
+            thread.Abort();
+            thread.Join();
             AppDomain.Unload(ad2);
-            try
+            /*try
             {
                 // Call the method again. Note that this time it fails
                 // because the second AppDomain was unloaded.
@@ -51,7 +73,7 @@ namespace AppDomainTester
             catch (AppDomainUnloadedException)
             {
                 Console.WriteLine("Failed call; this is expected.");
-            }
+            }*/
             //domain test end
 
         }

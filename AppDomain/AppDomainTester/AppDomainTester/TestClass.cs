@@ -11,13 +11,13 @@ namespace AppDomainTester
     class TestClass : MarshalByRefObject
     {
 
-        public void TestMethod(string callingDomainName)
+        public void TestMethod()
         {
             Assembly target = Assembly.LoadFrom(@"D:\Downloads\VisualStudio\VisualStudioProjects\Antivirus-Project\AppDomain\Application\TestAssembly\bin\Debug\TestAssembly.exe");
             Type[] types = target.GetTypes();
+            string callingDomainName = "Main appDomain";
             foreach (Type t in types)
             {
-
                 Console.WriteLine(t);
                 if (t.FullName.Contains("MainClass"))
                 {

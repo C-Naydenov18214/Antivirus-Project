@@ -22,6 +22,7 @@ namespace TestAssembly
                 ads.ApplicationBase,
                 ads.ConfigurationFile
             );
+            List<long> list = new List<long>(3);
             // Display the name of the calling AppDomain and the name
             // of the second domain.
             // NOTE: The application's thread has transitioned between
@@ -31,9 +32,15 @@ namespace TestAssembly
                 Thread.GetDomain().FriendlyName
             );
             AppDomain curDoMain = AppDomain.CurrentDomain;
-            Console.WriteLine($"Total Allocated Memory Size befor = {curDoMain.MonitoringTotalAllocatedMemorySize}");
+            while (true) 
+            {
+                list.Add(1);
+                Thread.Sleep(100);
+            }
+            
+            Console.WriteLine($"Total Allocated Memory Size befor in app = {curDoMain.MonitoringTotalAllocatedMemorySize}");
             Int64[] integers = new Int64[100000];
-            Console.WriteLine($"Total Allocated Memory Size after = {curDoMain.MonitoringTotalAllocatedMemorySize}");
+            Console.WriteLine($"Total Allocated Memory Size after in app = {curDoMain.MonitoringTotalAllocatedMemorySize}");
 
 
             return callingDomainName.Length;
