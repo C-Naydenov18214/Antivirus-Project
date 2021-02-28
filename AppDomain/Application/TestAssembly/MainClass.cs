@@ -31,10 +31,14 @@ namespace TestAssembly
                 callingDomainName,
                 Thread.GetDomain().FriendlyName
             );
+
+            double a = 10;
             AppDomain curDoMain = AppDomain.CurrentDomain;
             while (true) 
             {
                 list.Add(1);
+                a *= a * Math.Sqrt(a);
+                a = Math.Sqrt(a);
                 Thread.Sleep(100);
             }
             

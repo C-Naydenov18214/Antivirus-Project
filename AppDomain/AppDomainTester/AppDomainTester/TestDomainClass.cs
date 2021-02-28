@@ -28,8 +28,8 @@ namespace AppDomainTester
             // Create the second AppDomain.
             AppDomain.MonitoringIsEnabled = true;
             AppDomain ad2 = AppDomain.CreateDomain("Domain for application", null, ads);
-           
-            
+
+
             // Create an instance of MarshalbyRefType in the second AppDomain.
             // A proxy to the object is returned.
             TestClass mbrt =
@@ -40,24 +40,26 @@ namespace AppDomainTester
             // Call a method on the object via the proxy, passing the
             // default AppDomain's friendly name in as a parameter.
             Console.WriteLine($"Total Allocated Memory Size befor run app = {ad2.MonitoringTotalAllocatedMemorySize}");
-            long curAllocatedMemory = ad2.MonitoringSurvivedMemorySize;
+            long curAllocatedMemory = ad2.MonitoringTotalAllocatedMemorySize;
             Thread thread = new Thread(new ThreadStart(mbrt.TestMethod));
             thread.Start();
             long tmp;
-            while(true)
+            while (true)
             {
                 Thread.Sleep(100);
                 tmp = ad2.MonitoringTotalAllocatedMemorySize;
-                if (tmp > 42000)
+                /*if (tmp > 42000)
                 {
                     Console.WriteLine($"Current Allocated Memory Size Of App = {tmp}");
                     break;
-                }
+                }*/
                 if (tmp > curAllocatedMemory)
                 {
                     curAllocatedMemory = tmp;
+                    Console.WriteLine($"Current Allocated Memory Size Of App = {curAllocatedMemory}");
                 }
-                Console.WriteLine($"Current Allocated Memory Size Of App = {curAllocatedMemory}");
+                Console.WriteLine($"TotalProcessorTime = {ad2.MonitoringTotalProcessorTime}");
+                
             }
             Console.WriteLine($"Total Allocated Memory Size  Of App = {ad2.MonitoringTotalAllocatedMemorySize}");
             thread.Abort();
