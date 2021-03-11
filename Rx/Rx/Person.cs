@@ -6,10 +6,18 @@ using System.Threading.Tasks;
 
 namespace Rx
 {
-    class Person
+    public class Person
     {
         public int Age { get; set; }
         public string Name { get; set; }
+
+
+        public Person(int age, string name) 
+        {
+            this.Name = name;
+            this.Age = age;
+        
+        }
 
     }
 }
