@@ -9,6 +9,13 @@ namespace Rx
 {
     class Observer : IObserver<Person>
     {
+
+        public int Id { get; set; }
+        public Observer(int id) 
+        {
+            this.Id = id;
+        }
+
         public void OnCompleted()
         {
             Console.WriteLine("The end");
@@ -21,7 +28,7 @@ namespace Rx
 
         public void OnNext(Person value)
         {
-            Console.WriteLine("Observer " + value.Name + " " + Thread.CurrentThread.ManagedThreadId);
+            Console.WriteLine($"Observer {Id} get " + value.Name + " in " + Thread.CurrentThread.ManagedThreadId);
         }
     }
 }

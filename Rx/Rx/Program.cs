@@ -14,15 +14,19 @@ namespace Rx
         static void Main(string[] args)
         {
             Persons persons = new Persons();
-            var observer = new Observer();
-            var obs = persons.ObserveOn(Scheduler.Default).Subscribe(observer);
-            //persons.Subscribe(observer);
-            persons.AddPerson(new Person(1, "gege"));
-            persons.AddPerson(new Person(2, "ghewfe"));
-            persons.AddPerson(new Person(3, "ghge"));
-            persons.AddPerson(new Person(4, "e"));
-            persons.AddPerson(new Person(6, "new"));
+            var observer1 = new Observer(1);
+            var observer2 = new Observer(2);
+            var obs1 = persons.ObserveOn(NewThreadScheduler.Default).Subscribe(observer1);
+            var obs2 = persons.ObserveOn(NewThreadScheduler.Default).Subscribe(observer2);
+            int i = 0;
+            while (true)
+            {
+                //persons.Subscribe(observer);
+                persons.AddPerson(new Person(i, "cab"));
+                i++;
+            }
             persons.Stop();
+            
             Console.WriteLine($"main thread = {Thread.CurrentThread.ManagedThreadId}");
             Console.ReadLine();
             
