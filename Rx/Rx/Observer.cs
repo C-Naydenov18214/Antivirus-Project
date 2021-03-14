@@ -9,16 +9,19 @@ namespace Rx
 {
     class Observer : IObserver<Person>
     {
-
+        private AutoResetEvent _event;
         public int Id { get; set; }
-        public Observer(int id) 
+        public Observer(int id,AutoResetEvent _event)
         {
+            this._event = _event;
             this.Id = id;
         }
 
         public void OnCompleted()
         {
+            _event.Set();
             Console.WriteLine("The end");
+
         }
 
         public void OnError(Exception error)

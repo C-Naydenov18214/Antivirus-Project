@@ -14,12 +14,17 @@ namespace Rx
         static void Main(string[] args)
         {
             Persons persons = new Persons();
-            var observer1 = new Observer(1);
-            var observer2 = new Observer(2);
-            var obs1 = persons.ObserveOn(NewThreadScheduler.Default).Subscribe(observer1);
-            var obs2 = persons.ObserveOn(NewThreadScheduler.Default).Subscribe(observer2);
+            List<AutoResetEvent> events = new List<AutoResetEvent>(2);
             int i = 0;
-            while (true)
+            for (i = 0; i < 2; i++) {
+                events.Add(new AutoResetEvent(false));
+            }
+            var observer1 = new Observer(1,events[0]);
+            var observer2 = new Observer(2,events[1]);
+            var obs1 = persons.ObserveOn(TaskPoolScheduler.Default).Subscribe(observer1);
+            var obs2 = persons.ObserveOn(TaskPoolScheduler.Default).Subscribe(observer2);
+            i = 0;
+            while (i < 1000)
             {
                 //persons.Subscribe(observer);
                 persons.AddPerson(new Person(i, "cab"));
@@ -28,7 +33,8 @@ namespace Rx
             persons.Stop();
             
             Console.WriteLine($"main thread = {Thread.CurrentThread.ManagedThreadId}");
-            Console.ReadLine();
+            AutoResetEvent.WaitAll(events.ToArray());
+            Console.WriteLine("MAIN THE END");
             
             //List<Person> list = new List<Person>();
             //list.Add(new Person(1, "gege"));
