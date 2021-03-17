@@ -19,5 +19,9 @@ namespace Rx
         
         }
 
+        public override string ToString()
+        {
+            return $"Person with age = {Age} and name = {Name}";
+        }
     }
 }

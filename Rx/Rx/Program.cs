@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Rx
 {
@@ -19,8 +16,8 @@ namespace Rx
             for (i = 0; i < 2; i++) {
                 events.Add(new AutoResetEvent(false));
             }
-            var observer1 = new Observer(1,events[0]);
-            var observer2 = new Observer(2,events[1]);
+            var observer1 = new Observer<Person>(1,events[0]);
+            var observer2 = new Observer<Person>(2,events[1]);
             var obs1 = persons.ObserveOn(TaskPoolScheduler.Default).Subscribe(observer1);
             var obs2 = persons.ObserveOn(TaskPoolScheduler.Default).Subscribe(observer2);
             i = 0;

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Rx
 {
-    class Observer : IObserver<Person>
+    class  Observer<T> : IObserver<T>
     {
         private AutoResetEvent _event;
         public int Id { get; set; }
@@ -29,9 +29,9 @@ namespace Rx
             Console.WriteLine(error.Message);
         }
 
-        public void OnNext(Person value)
+        public void OnNext(T value)
         {
-            Console.WriteLine($"Observer {Id} get " + value.Name + " in " + Thread.CurrentThread.ManagedThreadId);
+            Console.WriteLine($"Observer {Id} get " + value.ToString() + " in " + Thread.CurrentThread.ManagedThreadId);
         }
     }
 }
