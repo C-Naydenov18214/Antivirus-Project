@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Diagnostics.Tracing.Parsers;
+using Microsoft.Diagnostics.Tracing.Session;
+using System;
 using System.Collections.Generic;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -32,20 +34,9 @@ namespace Rx
             Console.WriteLine($"main thread = {Thread.CurrentThread.ManagedThreadId}");
             AutoResetEvent.WaitAll(events.ToArray());
             Console.WriteLine("MAIN THE END");
-            
-            //List<Person> list = new List<Person>();
-            //list.Add(new Person(1, "gege"));
-            //list.Add(new Person(2, "ghewfe"));
-            //list.Add(new Person(3, "ghge"));
-            //list.Add(new Person(4, "e"));
-
-            //var v = Observable.ToObservable(list);//Where(p => p.Age % 2 == 0);
-         
-            //var obs = v.Subscribe(observer);
-            //v.Append(new Person(6, "new")).Subscribe(observer);
-
-
-
+          
         }
+
+        
     }
 }
