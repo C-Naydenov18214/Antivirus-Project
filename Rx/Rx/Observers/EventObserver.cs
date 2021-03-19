@@ -5,14 +5,14 @@ using System.Threading;
 
 namespace Rx.Observers
 {
-    class Observer<T> : IObserver<T> where T : TraceEvent
+    public class EventObserver<T> : IObserver<T> where T : TraceEvent
     {
 
         public int Id { get; }
-        public ConcurrentDictionary<int, T> dictionary;
+        public readonly ConcurrentDictionary<int, T> dictionary;
         private AutoResetEvent _event;
 
-        public Observer(int id, AutoResetEvent _event)
+        public EventObserver(int id, AutoResetEvent _event)
         {
             this.dictionary = new ConcurrentDictionary<int, T>();
             this.Id = id;
@@ -37,6 +37,19 @@ namespace Rx.Observers
             {
                 Console.WriteLine($"key {value.ProcessID} already exists");
             }
+        }
+
+
+        public bool ContainsKey(int id) 
+        {
+            return dictionary.ContainsKey(id);
+        }
+
+        public T GetValue(int id) 
+        {
+            T value;
+            dictionary.TryGetValue(id, out value);
+            return value;
         }
     }
 }

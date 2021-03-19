@@ -80,11 +80,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MainClass.cs" />
     <Compile Include="MainModule\Judge.cs" />
     <Compile Include="Observable\Events.cs" />
     <Compile Include="Observers\DllObserver.cs" />
-    <Compile Include="Observers\Observer.cs" />
-    <Compile Include="OldStuff\Observer.cs" />
+    <Compile Include="Observers\EventObserver.cs" />
+    <Compile Include="OldStuff\OldObserver.cs" />
     <Compile Include="OldStuff\Person.cs" />
     <Compile Include="OldStuff\Persons.cs" />
     <Compile Include="OldStuff\Program.cs" />

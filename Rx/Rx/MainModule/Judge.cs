@@ -5,43 +5,49 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Rx.Observers;
 
 namespace Rx.MainModule
 {
-    class Judge<V> where V : TraceEvent
+    public class Judge<T> where T : TraceEvent
     {
-        List<ConcurrentDictionary<int, V>> dictionaries;
+        List<EventObserver<T>> dictionaries;
         List<int> _ids;
         public Judge(params int[] processIds)
         {
             this._ids = new List<int>(processIds);
-            dictionaries = new List<ConcurrentDictionary<int, V>>();
+            dictionaries = new List<EventObserver<T>>();
         }
 
-        public void AddSource(ConcurrentDictionary<int, V> dictionary) 
+        public void AddSource(EventObserver<T> obs)
         {
-            dictionaries.Add(dictionary);
+            dictionaries.Add(obs);
         }
 
+        public void test(T arg) 
+        {
+        
+        
+        }
 
-        private void Work()
+        public void Work()
         {
             /*можно попробовать придумать что то с логикой событий, чтобы определение банить или нет было более элегантным*/
             bool ban = false;
-            while (true) 
+            while (true)
             {
-                foreach (ConcurrentDictionary<int, V> dictionary in dictionaries)
+                foreach (EventObserver<T> obs in dictionaries)
                 {
-                    ban = dictionary.ContainsKey(_ids[0]);
+                    ban = obs.ContainsKey(_ids[0]);
                 }
-                if (ban) 
+                if (ban)
                 {
                     Console.WriteLine($"Pls ban process {_ids[0]}");
                 }
-            
+
             }
-        
-        
+
+
         }
 
 
