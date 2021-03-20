@@ -21,17 +21,15 @@ namespace Rx
             var obs2 = new EventObserver<ProcessTraceData>(0,null);
             var obs3 = new EventObserver<ProcessTraceData>(0,null);
             
-            var dllEvents = new Events<ImageLoadTraceData>();
-            var processStartEvents = new Events<ProcessTraceData>();
-            var processEndEvents = new Events<ProcessTraceData>();
+            var dllEvents = new TraceEventsObservable<ImageLoadTraceData>();
+            var processStartEvents = new TraceEventsObservable<ProcessTraceData>();
+            var processEndEvents = new TraceEventsObservable<ProcessTraceData>();
             processStartEvents.ObserveOn(TaskPoolScheduler.Default).Subscribe(obs2);
             processEndEvents.ObserveOn(TaskPoolScheduler.Default).Subscribe(obs3);
             dllEvents.ObserveOn(TaskPoolScheduler.Default).Subscribe(obs1);
-            
-            var judge = new Judge<TraceEvent>(1, 2, 34);
+            var judgeEvents =  new BaseObservable<JudgeEvent>();
+            var judge = new Judge<JudgeEvent>(0, null,1, 2, 34);
 
-            //judge.AddSource(obs1); ???
-            judge.Work();
 
         }
 

@@ -81,9 +81,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainClass.cs" />
-    <Compile Include="MainModule\Judge.cs" />
-    <Compile Include="Observable\Events.cs" />
-    <Compile Include="Observers\DllObserver.cs" />
+    <Compile Include="Observers\Judge.cs" />
+    <Compile Include="MainModule\JudgeEvent.cs" />
+    <Compile Include="Observable\BaseObservable.cs" />
+    <Compile Include="Observable\TraceEventsObservable.cs" />
+    <Compile Include="Observers\BaseObserver.cs" />
     <Compile Include="Observers\EventObserver.cs" />
     <Compile Include="OldStuff\OldObserver.cs" />
     <Compile Include="OldStuff\Person.cs" />

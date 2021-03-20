@@ -5,32 +5,25 @@ using System.Threading;
 
 namespace Rx.Observers
 {
-    public class EventObserver<T> : IObserver<T> where T : TraceEvent
+    public class EventObserver<T> : BaseObserver<T> where T : TraceEvent
     {
-
-        public int Id { get; }
-        public readonly ConcurrentDictionary<int, T> dictionary;
-        private AutoResetEvent _event;
-
-        public EventObserver(int id, AutoResetEvent _event)
+        public EventObserver(int id, AutoResetEvent _event) : base(id,_event)
         {
             this.dictionary = new ConcurrentDictionary<int, T>();
-            this.Id = id;
-            this._event = _event;
         }
 
-        public void OnCompleted()
+        public override void OnCompleted()
         {
             _event.Set();
             Console.WriteLine($"observer {Id} completed");
         }
 
-        public void OnError(Exception error)
+        public override void OnError(Exception error)
         {
             Console.WriteLine(error.Message);
         }
 
-        public void OnNext(T value)
+        public override void OnNext(T value)
         {
             var ok = dictionary.TryAdd(value.ProcessID, value);
             if (!ok)
@@ -40,12 +33,12 @@ namespace Rx.Observers
         }
 
 
-        public bool ContainsKey(int id) 
+        public override bool ContainsKey(int id) 
         {
             return dictionary.ContainsKey(id);
         }
 
-        public T GetValue(int id) 
+        public override T GetValue(int id) 
         {
             T value;
             dictionary.TryGetValue(id, out value);

@@ -1,16 +1,15 @@
-﻿using Microsoft.Diagnostics.Tracing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rx.Observable
+namespace Rx.MainModule
 {
-    class Events<T> : IObservable<T> where T: TraceEvent
+    public class BaseObservable<T> : IObservable<T> 
     {
-        private List<IObserver<T>> observers;
-        public Events()
+        protected List<IObserver<T>> observers;
+        public BaseObservable()
         {
             observers = new List<IObserver<T>>();
         }
