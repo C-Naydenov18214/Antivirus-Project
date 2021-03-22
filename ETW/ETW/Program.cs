@@ -1,4 +1,6 @@
-﻿using ETW.Tracer;
+﻿using System;
+using System.Threading.Tasks;
+using ETW.Tracer;
 
 namespace ETW
 {
@@ -6,8 +8,9 @@ namespace ETW
     {
         private static void Main(string[] args)
         {
-            var eventTracer = new EventTracer();
-            eventTracer.Run();
+            var eventTracer = new EventTracer(Console.Out);
+            var task = Task.Run(eventTracer.Run);
+            task.Wait();
         }
     }
 }

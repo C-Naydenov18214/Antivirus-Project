@@ -1,32 +1,49 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
 using Microsoft.Diagnostics.Tracing.Session;
 
 namespace ETW.Tracer
 {
+    /// <summary>
+    /// Kernel event listener.
+    /// </summary>
     class EventTracer
     {
-
+        private readonly TextWriter _out;
         private TraceEventSession _kernelSession;
         private bool _isStopped;
 
+        public EventTracer()
+        {
+            _out = Console.Out;
+        }
+
+        public EventTracer(TextWriter @out)
+        {
+            _out = @out;
+        }
+
+        /// <summary>
+        /// Start event tracing.
+        /// </summary>
         public void Run()
         {
             if (!(TraceEventSession.IsElevated() ?? false))
             {
-                Console.WriteLine("Please run program as Administrator");
+                _out.WriteLine("Please run program as Administrator");
+                Debugger.Break();
                 return;
             }
 
-            Console.CancelKeyPress += delegate
+            Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs cancelArgs)
             {
                 _isStopped = true;
-                Console.WriteLine("Stopping all ETW sessions...");
+                _out.WriteLine("Stopping all ETW sessions...");
                 _kernelSession?.Dispose();
-                Environment.Exit(0);
+                cancelArgs.Cancel = true;
             };
 
             using (_kernelSession = new TraceEventSession(KernelTraceEventParser.KernelSessionName))
@@ -48,7 +65,9 @@ namespace ETW.Tracer
                 return;
             }
 
-            Console.WriteLine("ImageLoadEvent catched");
+#if DEBUG
+            _out.WriteLine("ImageLoadEvent from pid {0} caught", data.ProcessID);
+#endif
             // ...
         }
 
@@ -59,7 +78,9 @@ namespace ETW.Tracer
                 return;
             }
 
-            Console.WriteLine("FileWriteEvent catched");
+#if DEBUG
+            _out.WriteLine("FileWriteEvent from pid {0} caught", data.ProcessID);
+#endif
             // ...
         }
 
@@ -71,7 +92,9 @@ namespace ETW.Tracer
                 return;
             }
 
-            Console.WriteLine("FileReadEvent catched");
+#if DEBUG
+            _out.WriteLine("FileReadEvent from pid {0} caught", data.ProcessID);
+#endif
             // ...
         }
     }
