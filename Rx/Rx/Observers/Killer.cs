@@ -10,10 +10,10 @@ using System.Threading;
 
 namespace Rx.MainModule
 {
-    public class Judge<T> : BaseObserver<T> where T : JudgeEvent
+    public class Killer<I,O> : BaseObserver<I,O> where O : InternalEvent
     {
         List<int> _ids;
-        public Judge(int id, AutoResetEvent _event,params int[] processIds) : base(id,_event)
+        public Killer(int id, AutoResetEvent _event,params int[] processIds) : base(id,_event)
         {
             this._ids = new List<int>(processIds);
         }
@@ -21,14 +21,16 @@ namespace Rx.MainModule
         public override void OnCompleted()
         {
             Console.WriteLine("Work Comleted");
+            base._event.Set();
         }
 
         public override void OnError(Exception error)
         {
             Console.WriteLine(error.Message);
+            base._event.Set();
         }
 
-        public override void OnNext(T value)
+        public override void OnNext(I value)
         {
             Console.WriteLine("do some work");
             Work();

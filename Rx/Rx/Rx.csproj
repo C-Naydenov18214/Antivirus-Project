@@ -6,7 +6,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{29BC334A-1C67-43DA-A90E-3316D1B072A0}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <RootNamespace>Rx</RootNamespace>
     <AssemblyName>Rx</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
@@ -84,8 +84,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainClass.cs" />
-    <Compile Include="Observers\Judge.cs" />
-    <Compile Include="MainModule\JudgeEvent.cs" />
+    <Compile Include="Observers\Killer.cs" />
+    <Compile Include="MainModule\InternalEvent.cs" />
     <Compile Include="Observable\BaseObservable.cs" />
     <Compile Include="Observable\TraceEventsObservable.cs" />
     <Compile Include="Observers\BaseObserver.cs" />
