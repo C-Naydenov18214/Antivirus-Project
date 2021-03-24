@@ -15,7 +15,7 @@ namespace Rx
 {
     class MainClass
     {
-        public static void Main(string[] args) 
+        /*public static void Main(string[] args) 
         {
             var obs1 = new EventObserver<ImageLoadTraceData>(0,null);
             var obs2 = new EventObserver<ProcessTraceData>(0,null);
@@ -29,9 +29,9 @@ namespace Rx
             dllEvents.ObserveOn(TaskPoolScheduler.Default).Subscribe(obs1);
             var judgeEvents =  new BaseObservable<JudgeEvent>();
             var judge = new Judge<JudgeEvent>(0, null,1, 2, 34);
+            judgeEvents.ObserveOn(TaskPoolScheduler.Default).Subscribe(judge); 
 
-
-        }
+        }*/
 
 
     }

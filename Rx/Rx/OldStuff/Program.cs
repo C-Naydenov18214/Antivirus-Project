@@ -8,7 +8,7 @@ namespace Rx
 {
     class Program
     {
-        static void Main(string[] args)
+        static void OldMain(string[] args)
         {
             Persons persons = new Persons();
             List<AutoResetEvent> events = new List<AutoResetEvent>(2);
