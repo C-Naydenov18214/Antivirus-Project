@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
 using Microsoft.Diagnostics.Tracing.Session;
@@ -17,9 +18,9 @@ namespace ETW.Tracer
         private TraceEventSession _kernelSession;
         private bool _isStopped;
 
-        private BaseObservable<InternalEvent> dllInput;
-        private BaseObservable<InternalEvent> fwInput;
-        private BaseObservable<InternalEvent> frInput;
+        private BaseObservable<TraceEvent> dllInput;
+        private BaseObservable<TraceEvent> fwInput;
+        private BaseObservable<TraceEvent> frInput;
 
         public EventTracer()
         {
@@ -31,9 +32,9 @@ namespace ETW.Tracer
             _out = @out;
         }
 
-        public void setInputs(BaseObservable<InternalEvent> pdllInput,
-                              BaseObservable<InternalEvent> pfwInput,
-                              BaseObservable<InternalEvent> pfrInput)
+        public void setInputs(BaseObservable<TraceEvent> pdllInput,
+                              BaseObservable<TraceEvent> pfwInput,
+                              BaseObservable<TraceEvent> pfrInput)
         {
             dllInput = pdllInput;
             fwInput = pfwInput;
@@ -80,9 +81,9 @@ namespace ETW.Tracer
             }
 
 #if DEBUG
-            _out.WriteLine("ImageLoadEvent from pid {0} caught", data.ProcessID);
+           // _out.WriteLine("ImageLoadEvent from pid {0} caught", data.ProcessID);
 #endif
-            dllInput.AddEvent(new InternalEvent(data.ID, data.ProcessID, data.TimeStampRelativeMSec));
+            dllInput.AddEvent(data);
         }
 
         private void FileWriteEvent(FileIOReadWriteTraceData data)
@@ -93,9 +94,9 @@ namespace ETW.Tracer
             }
 
 #if DEBUG
-            _out.WriteLine("FileWriteEvent from pid {0} caught", data.ProcessID);
+           // _out.WriteLine("FileWriteEvent from pid {0} caught", data.ProcessID);
 #endif
-            fwInput.AddEvent(new InternalEvent(data.ID, data.ProcessID, data.TimeStampRelativeMSec));
+            fwInput.AddEvent(data);
         }
 
         private void FileReadEvent(FileIOReadWriteTraceData data)
@@ -107,9 +108,9 @@ namespace ETW.Tracer
             }
 
 #if DEBUG
-            _out.WriteLine("FileReadEvent from pid {0} caught", data.ProcessID);
+           // _out.WriteLine("FileReadEvent from pid {0} caught", data.ProcessID);
 #endif
-            frInput.AddEvent(new InternalEvent(data.ID, data.ProcessID, data.TimeStampRelativeMSec));
+            frInput.AddEvent(data);
         }
     }
 }
