@@ -41,6 +41,7 @@ namespace Rx.MainModule
 
         public void AddEvent(T newEvent)
         {
+            //Console.WriteLine("Add event start");
             foreach (var observer in observers)
             {
                 if (newEvent == null)
@@ -48,6 +49,7 @@ namespace Rx.MainModule
                 else
                     observer.OnNext(newEvent);
             }
+            //Console.WriteLine("Add event end");
         }
 
         public void Stop()

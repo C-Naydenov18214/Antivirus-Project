@@ -6,11 +6,10 @@ using System.Threading;
 
 namespace Rx.Observers
 {
-    public class EventObserver<I,O> : BaseObserver<I,O> where I : TraceEvent where O : InternalEvent
+    public class EventObserver<I, O> : BaseObserver<I, O> where I : TraceEvent where O : InternalEvent
     {
         public EventObserver(int id, AutoResetEvent _event) : base(id, _event)
         {
-            this.dictionary = new ConcurrentDictionary<int, I>();
         }
 
         public override void OnCompleted()
@@ -26,15 +25,9 @@ namespace Rx.Observers
 
         public override void OnNext(I value)
         {
-            var ok = dictionary.TryAdd(value.ProcessID, value);
-            if (!ok)
-            {
-                Console.WriteLine($"key {value.ProcessID} already exists");
-            }
-            /*process event som how*/
-
-            var e = new InternalEvent(value.ID, value.ProcessID, value.TimeStampRelativeMSec);
-            if (OutputStream != null)
+            Console.WriteLine($"obs {Id} got value");
+            var e = new InternalEvent(value.ID);
+            if (base.OutputStream != null)
             {
                 ToNextObserver(e as O);
             }
@@ -42,12 +35,11 @@ namespace Rx.Observers
 
         protected override void ToNextObserver(O inEvent)
         {
-            OutputStream.AddEvent(inEvent);
+            base.OutputStream.AddEvent(inEvent);
         }
 
         public override void ConnectTo(BaseObserver<O, O> to)
         {
-            Console.WriteLine($"Made connetction to {to.Id}");
             base.ConnectTo(to);
         }
 

@@ -14,11 +14,16 @@ namespace Rx.MainModule
         public double TimeStamp { get; }
 
 
-        public InternalEvent(TraceEventID eventType, int processID, double timeStamp) 
+        public InternalEvent(TraceEventID eventType, int processID, double timeStamp)
         {
             this.EventType = eventType;
             this.ProcessID = processID;
             this.TimeStamp = timeStamp;
+        }
+
+        public InternalEvent(TraceEventID eventType)
+        {
+            this.EventType = eventType;
         }
 
     }

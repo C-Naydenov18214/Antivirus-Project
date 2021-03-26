@@ -81,7 +81,7 @@ namespace ETW.Tracer
             }
 
 #if DEBUG
-           // _out.WriteLine("ImageLoadEvent from pid {0} caught", data.ProcessID);
+           //_out.WriteLine("ImageLoadEvent from pid {0} caught", data.ProcessID);
 #endif
             dllInput.AddEvent(data);
         }
@@ -94,7 +94,7 @@ namespace ETW.Tracer
             }
 
 #if DEBUG
-           // _out.WriteLine("FileWriteEvent from pid {0} caught", data.ProcessID);
+            //_out.WriteLine("FileWriteEvent from pid {0} caught", data.ProcessID);
 #endif
             fwInput.AddEvent(data);
         }
@@ -108,7 +108,7 @@ namespace ETW.Tracer
             }
 
 #if DEBUG
-           // _out.WriteLine("FileReadEvent from pid {0} caught", data.ProcessID);
+            //_out.WriteLine("FileReadEvent from pid {0} caught", data.ProcessID);
 #endif
             frInput.AddEvent(data);
         }
