@@ -14,7 +14,7 @@ using System.Threading;
 
 namespace Rx
 {
-    class MainClass
+    public class MainClass
     {
         public static void Main(string[] args) 
         {

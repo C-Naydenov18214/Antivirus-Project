@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ETW.Tracer;
 using Microsoft.Diagnostics.Tracing;
+using Rx;
 using Rx.MainModule;
 using Rx.Observers;
 
@@ -15,7 +16,28 @@ namespace ETW
     {
         private static void Main(string[] args)
         {
-            List<AutoResetEvent> events = new List<AutoResetEvent>(6);
+            List<AutoResetEvent> events = new List<AutoResetEvent>(2);
+            for (int i = 0; i < 3; i++)
+            {
+                events.Add(new AutoResetEvent(false));
+            }
+            var first = new BaseObserver<InternalEvent, InternalEvent>(1, events[0]);
+            var second = new BaseObserver<InternalEvent, InternalEvent>(2, events[1]);
+            var killer = new Killer<InternalEvent, InternalEvent>(3, events[2]);
+            var input = new BaseObservable<InternalEvent>();
+
+            input.ObserveOn(TaskPoolScheduler.Default).Subscribe(first);
+            first.ConnectTo(second);
+            second.ConnectTo(killer);
+            /*for (int i = 0; i < 10; i++)
+            {
+                input.AddEvent(new InternalEvent(new TraceEventID(), i * 5, 656d));
+            }
+            input.Stop();
+            AutoResetEvent.WaitAll(events.ToArray());*/
+            //var dllInput = new BaseObservable<InternalEvent>();
+            //MainClass.Main(null);
+            /*List<AutoResetEvent> events = new List<AutoResetEvent>(6);
             for (int i = 0; i < 7; i++)
             {
                 events.Add(new AutoResetEvent(false));
@@ -46,16 +68,14 @@ namespace ETW
 
             frInput.ObserveOn(TaskPoolScheduler.Default).Subscribe(first_t);
             first_t.ConnectTo(second_t);
-            second_t.ConnectTo(killer);
+            second_t.ConnectTo(killer);*/
 
             var eventTracer = new EventTracer(Console.Out);
-            eventTracer.setInputs(dllInput, fwInput, frInput);
+            eventTracer.setInputs(input);
             var task = Task.Run(eventTracer.Run);
             task.Wait();
 
-            dllInput.Stop();
-            fwInput.Stop();
-            frInput.Stop();
+            input.Stop();
             AutoResetEvent.WaitAll(events.ToArray());
         }
     }
