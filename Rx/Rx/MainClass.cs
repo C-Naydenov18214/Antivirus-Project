@@ -57,7 +57,7 @@ namespace Rx
             second.ConnectTo(killer);
             for (int i = 0; i < 10; i++) 
             {
-                input.AddEvent(new InternalEvent(new TraceEventID(), i * 5,656d)); 
+                //input.AddEvent(new InternalEvent(new TraceEventID(), i * 5,656d)); 
             }
             input.Stop();
             AutoResetEvent.WaitAll(events.ToArray());

@@ -10,12 +10,19 @@ using System.Threading;
 
 namespace Rx.MainModule
 {
-    public class Killer<I,O> : BaseObserver<I,O> where O : InternalEvent
+    public class Killer<I, O> : BaseObserver<I, O> where O : InternalEvent where I : InternalEvent
     {
         List<int> _ids;
-        public Killer(int id, AutoResetEvent _event,params int[] processIds) : base(id,_event)
+        private Dictionary<int, int> _dllEvents;
+        private Dictionary<int, int> _fwEvents;
+        private Dictionary<int, int> _frEvents;
+
+        public Killer(int id, AutoResetEvent _event, params int[] processIds) : base(id, _event)
         {
             this._ids = new List<int>(processIds);
+            _dllEvents = new Dictionary<int, int>();
+            _fwEvents = new Dictionary<int, int>();
+            _frEvents = new Dictionary<int, int>();
         }
 
         public override void OnCompleted()
@@ -32,27 +39,51 @@ namespace Rx.MainModule
 
         public override void OnNext(I value)
         {
-            Console.WriteLine("do some work");
-            Work();
+            switch (value.EventName)
+            {
+                case ("Image/Load"):
+                    AddToDcitionary(_dllEvents, value);
+                    break;
+                case ("FileIO/Read"):
+                    AddToDcitionary(_frEvents, value);
+                    break;
+                case ("FileIO/Write"):
+                    AddToDcitionary(_fwEvents, value);
+                    break;
+
+            }
         }
 
-        private void Work()
+        private void AddToDcitionary(Dictionary<int,int> dict, InternalEvent value)
         {
-            /*можно попробовать придумать что то с логикой событий, чтобы определение банить или нет было более элегантным*/
-            bool ban = false;
-            //while (true)
-            //{
 
-
-            //}
-
-
+            if (dict.ContainsKey(value.ProcessID))
+            {
+                dict[value.ProcessID]++;
+            }
+            else
+            {
+                dict.Add(value.ProcessID, 1);
+            }
         }
 
+        public void Result() 
+        {
+            Console.WriteLine("Dll events:");
+            ShowStattistics(_dllEvents);
+            Console.WriteLine("FileIO/Read events:");
+            ShowStattistics(_fwEvents);
+            Console.WriteLine("FileIO/Write events:");
+            ShowStattistics(_frEvents);
+        }
 
+        private void ShowStattistics(Dictionary<int, int> dict)
+        {
+            foreach (KeyValuePair<int, int> pair in dict)
+            {
 
-
-
-
+                Console.WriteLine($"process {pair.Key} {pair.Value} times");
+            }
+        }
     }
 }

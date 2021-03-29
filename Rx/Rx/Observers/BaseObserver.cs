@@ -48,7 +48,8 @@ namespace Rx.Observers
 
         public virtual void OnNext(I value)
         {
-            Console.WriteLine($"obs {Id} got value = {(value as InternalEvent).ProcessID}");
+            var v = (value as InternalEvent);
+            Console.WriteLine($"obs {Id} got value = {v.EventType} {v.EventName} {v.ProcessID} {v.TimeStamp}");
             if (OutputStream != null)
             {
                 ToNextObserver((value as O));
@@ -58,7 +59,7 @@ namespace Rx.Observers
         protected virtual void ToNextObserver(O inEvent)
         {
             OutputStream.AddEvent(inEvent);
-            Console.WriteLine($"obs {Id} sent value = {inEvent.ProcessID}");
+            //Console.WriteLine($"obs {Id} sent value = {inEvent.ProcessID}");
         }
 
 

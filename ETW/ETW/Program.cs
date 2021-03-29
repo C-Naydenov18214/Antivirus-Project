@@ -53,11 +53,13 @@ namespace ETW
             eventTracer.SetInputs(dllInput, fwInput, frInput);
             var task = Task.Run(eventTracer.Run);
             task.Wait();
-
+            
             dllInput.Stop();
             fwInput.Stop();
             frInput.Stop();
             AutoResetEvent.WaitAll(events.ToArray());
+            killer.Result();
+            Console.ReadLine();
         }
     }
 }
