@@ -1,15 +1,13 @@
 ﻿using Microsoft.Diagnostics.Tracing;
-using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
+using System.Threading.Tasks;
+using System.Reactive.Linq;
 using Rx.MainModule;
-using Rx.Observable;
 using Rx.Observers;
 using System.Reactive.Concurrency;
-using System.Reactive.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
 
 namespace Rx
@@ -18,53 +16,96 @@ namespace Rx
     {
         public static void Main(string[] args) 
         {
-            /*var obs1 = new EventObserver<ImageLoadTraceData,InternalEvent>(0,null);
-            var obs2 = new EventObserver<ProcessTraceData, InternalEvent>(0,null);
-            var obs3 = new EventObserver<ProcessTraceData, InternalEvent>(0,null);
-           
-            var dllEvents = new TraceEventsObservable<ImageLoadTraceData>();
-            var processStartEvents = new TraceEventsObservable<ProcessTraceData>();
-            var processEndEvents = new TraceEventsObservable<ProcessTraceData>();
-            processStartEvents.ObserveOn(TaskPoolScheduler.Default).Subscribe(obs2);
-            processEndEvents.ObserveOn(TaskPoolScheduler.Default).Subscribe(obs3);
-            dllEvents.ObserveOn(TaskPoolScheduler.Default).Subscribe(obs1);
-            var killerEvents =  new BaseObservable<InternalEvent>();
-            var killer = new Killer<InternalEvent, InternalEvent>(0, null,1, 2, 34);
-            killerEvents.ObserveOn(TaskPoolScheduler.Default).Subscribe(killer); */
             ConnectionTest();
-
-
-
-
         }
 
 
 
         public static void ConnectionTest() 
         {
-            List<AutoResetEvent> events = new List<AutoResetEvent>(2);
+           /* List<AutoResetEvent> events = new List<AutoResetEvent>(2);
             for (int i = 0; i < 3; i++)
             {
                 events.Add(new AutoResetEvent(false));
-            }
-            var first = new BaseObserver<InternalEvent, InternalEvent>(1,events[0]);
-            var second = new BaseObserver<InternalEvent, InternalEvent>(2, events[1]);
-            var killer = new Killer<InternalEvent, InternalEvent>(3, events[2]);
-            var input = new BaseObservable<InternalEvent>();
+            }*/
+            //var input = new BaseObservable<InternalEvent>();
             
-            input.ObserveOn(TaskPoolScheduler.Default).Subscribe(first);
-            first.ConnectTo(second);
-            second.ConnectTo(killer);
-            for (int i = 0; i < 10; i++) 
+            //input.ObserveOn(TaskPoolScheduler.Default).Subscribe(BaseObserver<InternalEvent,InternalEvent>.OnNext,ex=>Console.WriteLine(ex.Message),BaseObserver<InternalEvent, InternalEvent>.OnCompleted);
+            /*first.ConnectTo(second);
+            second.ConnectTo(killer);*/
+            //input.Stop();
+            //AutoResetEvent.WaitAll(events.ToArray());
+            IObservable<InternalEvent> ticketObservable = System.Reactive.Linq.Observable.Create<InternalEvent>(EventFactory.EventSubscribe).Where(elem => elem.ProcessID % 2 == 0);
+            using (IDisposable handle = ticketObservable.Subscribe(BaseObserver<InternalEvent, InternalEvent>.OnNext, ex => Console.WriteLine(ex.Message), BaseObserver<InternalEvent, InternalEvent>.OnCompleted))
             {
-                //input.AddEvent(new InternalEvent(new TraceEventID(), i * 5,656d)); 
+                Console.WriteLine("\nPress ENTER to unsubscribe...\n");
+                Console.ReadLine();
             }
-            input.Stop();
-            AutoResetEvent.WaitAll(events.ToArray());
-
 
         }
 
 
     }
+    public class EventFactory : IDisposable
+    {
+        private bool bGenerate = true;
+
+
+        internal EventFactory(object eventObserver)
+        {
+            //************************************************************************//
+            //*** The sequence generator for tickets will be run on another thread ***//
+            //************************************************************************//
+            Task.Factory.StartNew(new Action<object>(EventGenerator), eventObserver);
+        }
+
+
+        //**************************************************************************************************//
+        //*** Dispose frees the ticket generating resources by allowing the TicketGenerator to complete. ***//
+        //**************************************************************************************************//
+        public void Dispose()
+        {
+            bGenerate = false;
+        }
+
+
+        //*****************************************************************************************************************//
+        //*** TicketGenerator generates a new ticket every 3 sec and calls the observer's OnNext handler to deliver it. ***//
+        //*****************************************************************************************************************//
+        private void EventGenerator(object observer)
+        {
+            IObserver<InternalEvent> ticketObserver = (IObserver<InternalEvent>)observer;
+
+            //***********************************************************************************************//
+            //*** Generate a new ticket every 3 sec and call the observer's OnNext handler to deliver it. ***//
+            //***********************************************************************************************//
+            InternalEvent t;
+            int i = 0;
+            while (bGenerate)
+            {
+                t = new InternalEvent(new TraceEventID(),"hoh",i,i);
+                ticketObserver.OnNext(t);
+                Thread.Sleep(1000);
+                i++;
+            }
+        }
+
+
+
+        //********************************************************************************************************************************//
+        //*** TicketSubscribe starts the flow of tickets for the ticket sequence when a subscription is created. It is passed to       ***//
+        //*** Observable.Create() as the subscribe parameter. Observable.Create() returns the IObservable<Ticket> that is used to      ***//
+        //*** create subscriptions by calling the IObservable<Ticket>.Subscribe() method.                                              ***//
+        //***                                                                                                                          ***//
+        //*** The IDisposable interface returned by TicketSubscribe is returned from the IObservable<Ticket>.Subscribe() call. Calling ***//
+        //*** Dispose cancels the subscription freeing ticket generating resources.                                                    ***//
+        //********************************************************************************************************************************//
+        public static IDisposable EventSubscribe(object ticketObserver)
+        {
+            EventFactory tf = new EventFactory(ticketObserver);
+
+            return tf;
+        }
+    }
+
 }

@@ -11,80 +11,24 @@ using System.Threading.Tasks;
 
 namespace Rx.Observers
 {
-    public class BaseObserver<I, O> : IObserver<I> where O : InternalEvent
+    public class BaseObserver<I, O>  where O : InternalEvent
     {
-        public int Id { get; }
-        public ConcurrentDictionary<int, I> dictionary;
-        protected AutoResetEvent _event;
-
-        public BaseObservable<O> OutputStream { get; set; }
-
-
-        public BaseObserver(int id, AutoResetEvent _event)
+        public static void OnCompleted()
         {
-            this.dictionary = new ConcurrentDictionary<int, I>();
-            this.Id = id;
-            this._event = _event;
-            this.OutputStream = new BaseObservable<O>();
-        }
-        public virtual void OnCompleted()
-        {
-            if (OutputStream != null)
-            {
-                OutputStream.Stop();
-            }
-            _event.Set();
-            Console.WriteLine($"observer {Id} completed");
+            Console.WriteLine($"observer completed");
         }
 
-        public virtual void OnError(Exception error)
+        public static void OnError(Exception error)
         {
-            if (OutputStream != null)
-            {
-                OutputStream.Stop();
-            }
             Console.WriteLine(error.Message);
         }
 
-        public virtual void OnNext(I value)
+        public static void OnNext(I value)
         {
             var v = (value as InternalEvent);
-            Console.WriteLine($"obs {Id} got value = {v.EventType} {v.EventName} {v.ProcessID} {v.TimeStamp}");
-            if (OutputStream != null)
-            {
-                ToNextObserver((value as O));
-            }
+            Console.WriteLine($"obs got value = {v.EventType} {v.EventName} {v.ProcessID} {v.TimeStamp}");
         }
 
-        protected virtual void ToNextObserver(O inEvent)
-        {
-            OutputStream.AddEvent(inEvent);
-            //Console.WriteLine($"obs {Id} sent value = {inEvent.ProcessID}");
-        }
-
-
-        public virtual void ConnectTo(BaseObserver<O, O> to)
-        {
-            if (OutputStream == null)
-            {
-                OutputStream = new BaseObservable<O>();
-            }
-            OutputStream.ObserveOn(TaskPoolScheduler.Default).Subscribe(to);
-            Console.WriteLine($"obs {Id} connected to obs {to.Id}");
-        }
-
-
-        public virtual bool ContainsKey(int id)
-        {
-            return dictionary.ContainsKey(id);
-        }
-
-        public virtual I GetValue(int id)
-        {
-            I value;
-            dictionary.TryGetValue(id, out value);
-            return value;
-        }
     }
 }
 

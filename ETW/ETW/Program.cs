@@ -16,7 +16,9 @@ namespace ETW
     {
         private static void Main(string[] args)
         {
-            List<AutoResetEvent> events = new List<AutoResetEvent>(6);
+
+            MainClass.Main(null);
+            /*List<AutoResetEvent> events = new List<AutoResetEvent>(6);
             for (int i = 0; i < 7; i++)
             {
                 events.Add(new AutoResetEvent(false));
@@ -59,7 +61,7 @@ namespace ETW
             frInput.Stop();
             AutoResetEvent.WaitAll(events.ToArray());
             killer.Result();
-            Console.ReadLine();
+            Console.ReadLine();*/
         }
     }
 }
