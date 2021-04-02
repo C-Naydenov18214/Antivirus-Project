@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reactive.Linq;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
@@ -81,7 +82,7 @@ namespace ETW.Tracer
             }
 
 #if DEBUG
-           //_out.WriteLine("ImageLoadEvent from pid {0} caught", data.ProcessID);
+            //_out.WriteLine("ImageLoadEvent from pid {0} caught", data.ProcessID);
 #endif
             _dllInput?.AddEvent(new InternalEvent(data.ID, data.EventName, data.ProcessID, data.TimeStampRelativeMSec));
         }
@@ -112,5 +113,9 @@ namespace ETW.Tracer
 #endif
             _frInput?.AddEvent(new InternalEvent(data.ID, data.EventName, data.ProcessID, data.TimeStampRelativeMSec));
         }
+
+
+
+
     }
 }
