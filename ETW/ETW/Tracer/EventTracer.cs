@@ -22,7 +22,7 @@ namespace ETW.Tracer
         private BaseObservable<InternalEvent> _dllInput;
         private BaseObservable<InternalEvent> _fwInput;
         private BaseObservable<InternalEvent> _frInput;
-
+        public IObservable<IGroupedObservable<int, InternalEvent>> mergedGroups;
         public EventTracer()
         {
             _out = Console.Out;
@@ -114,6 +114,48 @@ namespace ETW.Tracer
             _frInput?.AddEvent(new InternalEvent(data.ID, data.EventName, data.ProcessID, data.TimeStampRelativeMSec));
         }
 
+
+        public void Test() 
+        {
+
+
+
+
+            if (!(TraceEventSession.IsElevated() ?? false))
+            {
+                _out.WriteLine("Please run program as Administrator");
+                Debugger.Break();
+                return;
+            }
+
+            Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs cancelArgs)
+            {
+                _isStopped = true;
+                _out.WriteLine("Stopping all ETW sessions...");
+                _kernelSession?.Dispose();
+                cancelArgs.Cancel = true;
+            };
+
+            using (_kernelSession = new TraceEventSession(KernelTraceEventParser.KernelSessionName))
+            {
+                _kernelSession.EnableKernelProvider(KernelTraceEventParser.Keywords.All);
+                //Observable.Start<ImageLoadTraceData>(h => _kernelSession.Source.Kernel.ImageLoad += h, h => _kernelSession.Source.Kernel.ImageLoad -= h);
+                var dll = Observable.FromEvent<ImageLoadTraceData>(h => _kernelSession.Source.Kernel.ImageLoad += h, h => _kernelSession.Source.Kernel.ImageLoad -= h).Select(i => Transform(i));
+                var write = Observable.FromEvent<FileIOReadWriteTraceData>(h => _kernelSession.Source.Kernel.FileIOWrite += h, h => _kernelSession.Source.Kernel.FileIOWrite -= h).Select(i => Transform(i));
+                var read = Observable.FromEvent<FileIOReadWriteTraceData>(h => _kernelSession.Source.Kernel.FileIORead += h, h => _kernelSession.Source.Kernel.FileIORead -= h).Select(i => Transform(i));
+
+
+                 mergedGroups = dll.Merge(write).Merge(read).GroupBy(i => i.ProcessID);
+               
+                _kernelSession.Source.Process();
+            }
+
+
+        }
+
+        public InternalEvent Transform(TraceEvent data) {
+            return new InternalEvent(data.ID, data.EventName, data.ProcessID, data.TimeStampRelativeMSec);
+        }
 
 
 

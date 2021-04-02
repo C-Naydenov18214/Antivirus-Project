@@ -14,22 +14,22 @@ namespace Rx
 {
     public class MainClass
     {
-        public static void Main(string[] args) 
+        public static void Main(string[] args)
         {
             ConnectionTest();
         }
 
 
 
-        public static void ConnectionTest() 
+        public static void ConnectionTest()
         {
-           /* List<AutoResetEvent> events = new List<AutoResetEvent>(2);
-            for (int i = 0; i < 3; i++)
-            {
-                events.Add(new AutoResetEvent(false));
-            }*/
+            /* List<AutoResetEvent> events = new List<AutoResetEvent>(2);
+             for (int i = 0; i < 3; i++)
+             {
+                 events.Add(new AutoResetEvent(false));
+             }*/
             //var input = new BaseObservable<InternalEvent>();
-            
+
             //input.ObserveOn(TaskPoolScheduler.Default).Subscribe(BaseObserver<InternalEvent,InternalEvent>.OnNext,ex=>Console.WriteLine(ex.Message),BaseObserver<InternalEvent, InternalEvent>.OnCompleted);
             /*first.ConnectTo(second);
             second.ConnectTo(killer);*/
@@ -40,7 +40,9 @@ namespace Rx
             IObservable<InternalEvent> merged = EventObservable2.Merge(EventObservable5);
             var group = merged.GroupBy(i => i.ProcessID);
             group.Subscribe(g => { Console.Write($"g key = {g.Key} "); g.Count().Subscribe(i => Console.Write("count = " + i.ToString())); g.Subscribe(el => Console.Write($"g elem = {el.ProcessID}\n")); });
-            using (IDisposable handle = EventObservable2.Subscribe(ev=>Console.WriteLine($"IN 2 {ev.ProcessID}"), ex => Console.WriteLine(ex.Message), BaseObserver<InternalEvent, InternalEvent>.OnCompleted), handle5 = EventObservable5.Subscribe(ev => Console.WriteLine($"IN 5 {ev.ProcessID}"), ex => Console.WriteLine(ex.Message), BaseObserver<InternalEvent, InternalEvent>.OnCompleted), hadler = merged.Subscribe(ev => Console.WriteLine($"in MERGED {ev.ProcessID}"),ex => Console.WriteLine(ex.Message)))
+            using (IDisposable handle = EventObservable2.Subscribe(ev => Console.WriteLine($"IN 2 {ev.ProcessID}"), ex => Console.WriteLine(ex.Message), BaseObserver<InternalEvent, InternalEvent>.OnCompleted),
+                handle5 = EventObservable5.Subscribe(ev => Console.WriteLine($"IN 5 {ev.ProcessID}"), ex => Console.WriteLine(ex.Message), BaseObserver<InternalEvent, InternalEvent>.OnCompleted),
+                hadler = merged.Subscribe(ev => Console.WriteLine($"in MERGED {ev.ProcessID}"), ex => Console.WriteLine(ex.Message)))
             {
                 Console.WriteLine("\nPress ENTER to unsubscribe...\n");
                 Console.ReadLine();
@@ -87,7 +89,7 @@ namespace Rx
             int i = 0;
             while (bGenerate)
             {
-                t = new InternalEvent(new TraceEventID(),"hoh",i,i);
+                t = new InternalEvent(new TraceEventID(), "hoh", i, i);
                 ticketObserver.OnNext(t);
                 Thread.Sleep(100);
                 i++;

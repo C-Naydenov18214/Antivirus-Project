@@ -17,7 +17,7 @@ namespace ETW
         private static void Main(string[] args)
         {
 
-            MainClass.Main(null);
+            //MainClass.Main(null);
             /*List<AutoResetEvent> events = new List<AutoResetEvent>(6);
             for (int i = 0; i < 7; i++)
             {
@@ -62,6 +62,21 @@ namespace ETW
             AutoResetEvent.WaitAll(events.ToArray());
             killer.Result();
             Console.ReadLine();*/
+
+            var eventTracer = new EventTracer(Console.Out);
+            var task = Task.Run(eventTracer.Test);
+            Thread.Sleep(1000);
+            eventTracer.mergedGroups.Subscribe(group => PrintInf(group));
+            task.Wait();
+        }
+
+        public static void PrintInf(IGroupedObservable<int, InternalEvent> group)
+        {
+            Console.Write("Group key = " + group.Key + "\n");
+            group.Subscribe(data => Console.WriteLine($"\t ProcessID = {data.ProcessID} Eventname = { data.EventName} EventType = { data.EventType} TimeStamp = {data.TimeStamp} "));
         }
     }
+
+
+
 }
