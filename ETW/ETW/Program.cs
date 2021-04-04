@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -14,6 +15,8 @@ namespace ETW
 {
     sealed class Program
     {
+        public static ConcurrentDictionary<int, ConcurrentBag<InternalEvent>> dict = new ConcurrentDictionary<int, ConcurrentBag<InternalEvent>>();
+
         private static void Main(string[] args)
         {
 
@@ -66,17 +69,50 @@ namespace ETW
             var eventTracer = new EventTracer(Console.Out);
             var task = Task.Run(eventTracer.Test);
             Thread.Sleep(1000);
-            eventTracer.mergedGroups.Subscribe(group => PrintInf(group));
+            var procGroups = eventTracer.mergedGroups;
+            procGroups.Subscribe(group => ProcessGroup(group));
             task.Wait();
+            int i = 0;
+            Console.WriteLine($"Process count = {dict.Count}");
+            foreach (var dictElem in dict)
+            {
+                Console.WriteLine($"{i++}. Process ID = {dictElem.Key}");
+                foreach (var bag in dictElem.Value)
+                {
+                    Console.WriteLine($"{bag.EventType} {bag.EventName} {bag.TimeStamp}");
+                }
+
+            }
+            Console.ReadLine();
         }
 
-        public static void PrintInf(IGroupedObservable<int, InternalEvent> group)
+
+        public static void TestProcessGroup(IGroupedObservable<int, InternalEvent> group)
         {
-            Console.Write("Group key = " + group.Key + "\n");
-            group.Subscribe(data => Console.WriteLine($"\t ProcessID = {data.ProcessID} Eventname = { data.EventName} EventType = { data.EventType} TimeStamp = {data.TimeStamp} "));
+            var res = group.GroupBy(i => i.EventName);//.Select(n => new InternalEvent() { EventName = n.Key.EventName, ProcessID = n.Key.ProcessID });
+
+        }
+
+        public static void ProcessGroup(IGroupedObservable<int, InternalEvent> group)
+        {
+            Console.WriteLine($"{dict.Count}. Group key = {group.Key}");
+            group.Subscribe(data => AddEvent(data));//Console.WriteLine($"\t ProcessID = {data.ProcessID} Eventname = { data.EventName} EventType = { data.EventType} TimeStamp = {data.TimeStamp} "));
+        }
+        public static void AddEvent(InternalEvent elem)
+        {
+            if (dict.ContainsKey(elem.ProcessID))
+            {
+                dict[elem.ProcessID].Add(elem);
+            }
+            else
+            {
+                var bag = new ConcurrentBag<InternalEvent>();
+                bag.Add(elem);
+                dict.TryAdd(elem.ProcessID, bag);
+
+            }
         }
     }
-
 
 
 }

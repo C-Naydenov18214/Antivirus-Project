@@ -115,7 +115,7 @@ namespace ETW.Tracer
         }
 
 
-        public void Test() 
+        public void Test()
         {
 
 
@@ -143,17 +143,20 @@ namespace ETW.Tracer
                 var dll = Observable.FromEvent<ImageLoadTraceData>(h => _kernelSession.Source.Kernel.ImageLoad += h, h => _kernelSession.Source.Kernel.ImageLoad -= h).Select(i => Transform(i));
                 var write = Observable.FromEvent<FileIOReadWriteTraceData>(h => _kernelSession.Source.Kernel.FileIOWrite += h, h => _kernelSession.Source.Kernel.FileIOWrite -= h).Select(i => Transform(i));
                 var read = Observable.FromEvent<FileIOReadWriteTraceData>(h => _kernelSession.Source.Kernel.FileIORead += h, h => _kernelSession.Source.Kernel.FileIORead -= h).Select(i => Transform(i));
+                FileIOReadWriteTraceData d;
+                ImageLoadTraceData d1;
 
 
-                 mergedGroups = dll.Merge(write).Merge(read).GroupBy(i => i.ProcessID);
-               
+                mergedGroups = dll.Merge(write).Merge(read).GroupBy(i => i.ProcessID);
+
                 _kernelSession.Source.Process();
             }
 
 
         }
 
-        public InternalEvent Transform(TraceEvent data) {
+        public InternalEvent Transform(TraceEvent data)
+        {
             return new InternalEvent(data.ID, data.EventName, data.ProcessID, data.TimeStampRelativeMSec);
         }
 

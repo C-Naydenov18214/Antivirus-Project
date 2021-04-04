@@ -84,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainClass.cs" />
+    <Compile Include="MainModule\SameTime.cs" />
     <Compile Include="Observers\Killer.cs" />
     <Compile Include="MainModule\InternalEvent.cs" />
     <Compile Include="OObservable\BaseObservable.cs" />

@@ -9,18 +9,22 @@ namespace Rx.MainModule
 {
     public class InternalEvent
     {
-        public TraceEventID EventType { get; }
-        public int ProcessID { get; }
-        public double TimeStamp { get; }
-        public string EventName { get; }
+        public TraceEventID EventType { get; set; }
+        public int ProcessID { get; set; }
+        public double TimeStamp { get; set; }
+        public string EventName { get; set; }
 
 
-        public InternalEvent(TraceEventID eventType,string eventName ,int processID, double timeStamp)
+        public InternalEvent(TraceEventID eventType, string eventName, int processID, double timeStamp)
         {
             this.EventType = eventType;
             this.EventName = eventName;
             this.ProcessID = processID;
             this.TimeStamp = timeStamp;
+        }
+
+        public InternalEvent()
+        {
         }
 
         public InternalEvent(TraceEventID eventType)
