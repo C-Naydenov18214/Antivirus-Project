@@ -19,10 +19,7 @@ namespace ETW.Tracer
         private TraceEventSession _kernelSession;
         private bool _isStopped;
 
-        private BaseObservable<InternalEvent> _dllInput;
-        private BaseObservable<InternalEvent> _fwInput;
-        private BaseObservable<InternalEvent> _frInput;
-        public IObservable<IGroupedObservable<int, InternalEvent>> mergedGroups;
+        public IObservable<IGroupedObservable<string, FileEvent>> mergedGroups;
         public EventTracer()
         {
             _out = Console.Out;
@@ -33,14 +30,6 @@ namespace ETW.Tracer
             _out = @out;
         }
 
-        public void SetInputs(BaseObservable<InternalEvent> pdllInput,
-                              BaseObservable<InternalEvent> pfwInput,
-                              BaseObservable<InternalEvent> pfrInput)
-        {
-            _dllInput = pdllInput;
-            _fwInput = pfwInput;
-            _frInput = pfrInput;
-        }
 
         /// <summary>
         /// Start event tracing.
@@ -84,7 +73,7 @@ namespace ETW.Tracer
 #if DEBUG
             //_out.WriteLine("ImageLoadEvent from pid {0} caught", data.ProcessID);
 #endif
-            _dllInput?.AddEvent(new InternalEvent(data.ID, data.EventName, data.ProcessID, data.TimeStampRelativeMSec));
+           // _dllInput?.AddEvent(new InternalEvent(data.ID, data.EventName, data.ProcessID, data.TimeStampRelativeMSec));
         }
 
         private void FileWriteEvent(FileIOReadWriteTraceData data)
@@ -97,7 +86,7 @@ namespace ETW.Tracer
 #if DEBUG
             //_out.WriteLine("FileWriteEvent from pid {0} caught", data.ProcessID);
 #endif
-            _fwInput?.AddEvent(new InternalEvent(data.ID, data.EventName, data.ProcessID, data.TimeStampRelativeMSec));
+            //_fwInput?.AddEvent(new InternalEvent(data.ID, data.EventName, data.ProcessID, data.TimeStampRelativeMSec));
         }
 
         private void FileReadEvent(FileIOReadWriteTraceData data)
@@ -111,7 +100,7 @@ namespace ETW.Tracer
 #if DEBUG
             //_out.WriteLine("FileReadEvent from pid {0} caught", data.ProcessID);
 #endif
-            _frInput?.AddEvent(new InternalEvent(data.ID, data.EventName, data.ProcessID, data.TimeStampRelativeMSec));
+            //_frInput?.AddEvent(new InternalEvent(data.ID, data.EventName, data.ProcessID, data.TimeStampRelativeMSec));
         }
 
 
@@ -140,14 +129,12 @@ namespace ETW.Tracer
             {
                 _kernelSession.EnableKernelProvider(KernelTraceEventParser.Keywords.All);
                 //Observable.Start<ImageLoadTraceData>(h => _kernelSession.Source.Kernel.ImageLoad += h, h => _kernelSession.Source.Kernel.ImageLoad -= h);
-                var dll = Observable.FromEvent<ImageLoadTraceData>(h => _kernelSession.Source.Kernel.ImageLoad += h, h => _kernelSession.Source.Kernel.ImageLoad -= h).Select(i => Transform(i));
-                var write = Observable.FromEvent<FileIOReadWriteTraceData>(h => _kernelSession.Source.Kernel.FileIOWrite += h, h => _kernelSession.Source.Kernel.FileIOWrite -= h).Select(i => Transform(i));
-                var read = Observable.FromEvent<FileIOReadWriteTraceData>(h => _kernelSession.Source.Kernel.FileIORead += h, h => _kernelSession.Source.Kernel.FileIORead -= h).Select(i => Transform(i));
-                FileIOReadWriteTraceData d;
-                ImageLoadTraceData d1;
+                var dll = Observable.FromEvent<ImageLoadTraceData>(h => _kernelSession.Source.Kernel.ImageLoad += h, h => _kernelSession.Source.Kernel.ImageLoad -= h).Where(i => i.FileName.EndsWith(".dll")).Select(i => Transformer.TransformToFileEvent(i));
+                var write = Observable.FromEvent<FileIOReadWriteTraceData>(h => _kernelSession.Source.Kernel.FileIOWrite += h, h => _kernelSession.Source.Kernel.FileIOWrite -= h).Where(i => i.FileName.EndsWith(".dll")).Select(i => Transformer.TransformToFileEvent(i));
+                var read = Observable.FromEvent<FileIOReadWriteTraceData>(h => _kernelSession.Source.Kernel.FileIORead += h, h => _kernelSession.Source.Kernel.FileIORead -= h).Where(i => i.FileName.EndsWith(".dll")).Select(i => Transformer.TransformToFileEvent(i));
+                
 
-
-                mergedGroups = dll.Merge(write).Merge(read).GroupBy(i => i.ProcessID);
+                mergedGroups = dll.Merge(write).Merge(read).GroupBy(i => i.FileName);
 
                 _kernelSession.Source.Process();
             }
@@ -155,10 +142,10 @@ namespace ETW.Tracer
 
         }
 
-        public InternalEvent Transform(TraceEvent data)
+        /*public InternalEvent Transform(TraceEvent data)
         {
             return new InternalEvent(data.ID, data.EventName, data.ProcessID, data.TimeStampRelativeMSec);
-        }
+        }*/
 
 
 

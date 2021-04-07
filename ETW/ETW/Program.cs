@@ -16,7 +16,9 @@ namespace ETW
     sealed class Program
     {
         public static ConcurrentDictionary<int, ConcurrentBag<InternalEvent>> dict = new ConcurrentDictionary<int, ConcurrentBag<InternalEvent>>();
-
+        public static ConcurrentDictionary<string, ConcurrentBag<FileEvent>> dictFileEvents = new ConcurrentDictionary<string, ConcurrentBag<FileEvent>>();
+        static int c = 0;
+        static Mutex mutex = new Mutex();
         private static void Main(string[] args)
         {
 
@@ -73,13 +75,13 @@ namespace ETW
             procGroups.Subscribe(group => ProcessGroup(group));
             task.Wait();
             int i = 0;
-            Console.WriteLine($"Process count = {dict.Count}");
-            foreach (var dictElem in dict)
+            Console.WriteLine($"Process count = {dictFileEvents.Count}");
+            foreach (var dictElem in dictFileEvents)
             {
                 Console.WriteLine($"{i++}. Process ID = {dictElem.Key}");
                 foreach (var bag in dictElem.Value)
                 {
-                    Console.WriteLine($"{bag.EventType} {bag.EventName} {bag.TimeStamp}");
+                    Console.WriteLine($"\t{bag.ProcessID} {bag.ProcessName} {bag.EventName} {bag.TimeStamp}");
                 }
 
             }
@@ -87,16 +89,38 @@ namespace ETW
         }
 
 
-        public static void TestProcessGroup(IGroupedObservable<int, InternalEvent> group)
+        /*public static void TestProcessGroup(IGroupedObservable<int, InternalEvent> group)
         {
             var res = group.GroupBy(i => i.EventName);//.Select(n => new InternalEvent() { EventName = n.Key.EventName, ProcessID = n.Key.ProcessID });
 
-        }
+        }*/
 
         public static void ProcessGroup(IGroupedObservable<int, InternalEvent> group)
         {
-            Console.WriteLine($"{dict.Count}. Group key = {group.Key}");
+            Console.WriteLine($"{dictFileEvents.Count}. Group key = {group.Key}");
             group.Subscribe(data => AddEvent(data));//Console.WriteLine($"\t ProcessID = {data.ProcessID} Eventname = { data.EventName} EventType = { data.EventType} TimeStamp = {data.TimeStamp} "));
+        }
+
+        public static void ProcessGroup(IGroupedObservable<string, FileEvent> group)
+        {
+            Console.WriteLine($"{dictFileEvents.Count}. Group key = {group.Key}");
+            group.Window(TimeSpan.FromMilliseconds(200)).Subscribe(w => ProcessWindow(w));
+            group.Subscribe(data => AddEvent(data));//Console.WriteLine($"\t ProcessID = {data.ProcessID} Eventname = { data.EventName} EventType = { data.EventType} TimeStamp = {data.TimeStamp} "));
+        }
+
+        public static void ProcessWindow(IObservable<FileEvent> window)
+        {
+
+            window.Subscribe(w => PrintWindowElem(w));
+        }
+
+        private static void PrintWindowElem(FileEvent w) 
+        {
+            mutex.WaitOne();
+            Console.WriteLine($"\t{c}. {w.ProcessID} : {w.ProcessName} : {w.EventName} : {w.TimeStamp}");
+            c++;
+            mutex.ReleaseMutex();
+
         }
         public static void AddEvent(InternalEvent elem)
         {
@@ -109,6 +133,21 @@ namespace ETW
                 var bag = new ConcurrentBag<InternalEvent>();
                 bag.Add(elem);
                 dict.TryAdd(elem.ProcessID, bag);
+
+            }
+        }
+
+        public static void AddEvent(FileEvent elem)
+        {
+            if (dictFileEvents.ContainsKey(elem.FileName))
+            {
+                dictFileEvents[elem.FileName].Add(elem);
+            }
+            else
+            {
+                var bag = new ConcurrentBag<FileEvent>();
+                bag.Add(elem);
+                dictFileEvents.TryAdd(elem.FileName, bag);
 
             }
         }

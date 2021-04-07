@@ -84,11 +84,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainClass.cs" />
+    <Compile Include="MainModule\FileEvent.cs" />
     <Compile Include="MainModule\SameTime.cs" />
+    <Compile Include="MainModule\Transformer.cs" />
     <Compile Include="Observers\Killer.cs" />
     <Compile Include="MainModule\InternalEvent.cs" />
-    <Compile Include="OObservable\BaseObservable.cs" />
-    <Compile Include="OObservable\TraceEventsObservable.cs" />
     <Compile Include="Observers\BaseObserver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
