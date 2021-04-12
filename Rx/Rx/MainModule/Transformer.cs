@@ -28,5 +28,9 @@ namespace Rx.MainModule
 
             throw new Exception("Faild to create FileEvent");
         }
+        public static ProcessStatus TransformToProcessStatus(FileEvent ev)
+        {
+            return new ProcessStatus(ev.ProcessID, 0);
+        }
     }
 }

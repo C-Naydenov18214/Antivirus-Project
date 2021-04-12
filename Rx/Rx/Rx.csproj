@@ -85,6 +85,7 @@
   <ItemGroup>
     <Compile Include="MainClass.cs" />
     <Compile Include="MainModule\FileEvent.cs" />
+    <Compile Include="MainModule\ProcessStatus.cs" />
     <Compile Include="MainModule\SameTime.cs" />
     <Compile Include="MainModule\Transformer.cs" />
     <Compile Include="Observers\Killer.cs" />

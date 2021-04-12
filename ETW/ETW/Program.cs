@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
@@ -17,6 +18,7 @@ namespace ETW
     {
         public static ConcurrentDictionary<int, ConcurrentBag<InternalEvent>> dict = new ConcurrentDictionary<int, ConcurrentBag<InternalEvent>>();
         public static ConcurrentDictionary<string, ConcurrentBag<FileEvent>> dictFileEvents = new ConcurrentDictionary<string, ConcurrentBag<FileEvent>>();
+        public static ConcurrentDictionary<int, ProcessStatus> suspicions = new ConcurrentDictionary<int, ProcessStatus>();
         static int c = 0;
         static Mutex mutex = new Mutex();
         private static void Main(string[] args)
@@ -98,23 +100,57 @@ namespace ETW
         public static void ProcessGroup(IGroupedObservable<int, InternalEvent> group)
         {
             Console.WriteLine($"{dictFileEvents.Count}. Group key = {group.Key}");
-            group.Subscribe(data => AddEvent(data));//Console.WriteLine($"\t ProcessID = {data.ProcessID} Eventname = { data.EventName} EventType = { data.EventType} TimeStamp = {data.TimeStamp} "));
+            group.Subscribe(data => AddEvent(data));
         }
 
         public static void ProcessGroup(IGroupedObservable<string, FileEvent> group)
         {
             Console.WriteLine($"{dictFileEvents.Count}. Group key = {group.Key}");
             group.Window(TimeSpan.FromMilliseconds(200)).Subscribe(w => ProcessWindow(w));
-            group.Subscribe(data => AddEvent(data));//Console.WriteLine($"\t ProcessID = {data.ProcessID} Eventname = { data.EventName} EventType = { data.EventType} TimeStamp = {data.TimeStamp} "));
+            group.Subscribe(data => AddEvent(data));
         }
 
         public static void ProcessWindow(IObservable<FileEvent> window)
         {
-
+            /*var em = window.ToEnumerable<FileEvent>();
+            bool isLoad = false;
+            bool isWrite = false;
+            Console.WriteLine($"\t HERE");
+            foreach (var el in em)
+            {
+                PrintWindowElem(el);
+            }*/
             window.Subscribe(w => PrintWindowElem(w));
+
         }
 
-        private static void PrintWindowElem(FileEvent w) 
+        private static void AnalyzeWindow(IObservable<FileEvent> window)
+        {
+            window.GroupBy(i => i.ProcessID).Subscribe(g => ProcessGroup(g));//.Subscribe для обработки одельного элемента;
+            //window.Subscribe(w => AnalyzeGroupElement(w));
+        }
+        public static void ProcessGroup(IGroupedObservable<int, FileEvent> group)
+        {
+
+            group.Subscribe(el => AnalyzeGroupElement(el));
+        }
+
+        private static void AnalyzeGroupElement(FileEvent elem)
+        {
+            ProcessStatus curProc;
+            if (suspicions.ContainsKey(elem.ProcessID))
+            {
+                curProc = suspicions[elem.ProcessID];
+            }
+            else
+            {
+            
+            
+            }
+
+        }
+
+        private static void PrintWindowElem(FileEvent w)
         {
             mutex.WaitOne();
             Console.WriteLine($"\t{c}. {w.ProcessID} : {w.ProcessName} : {w.EventName} : {w.TimeStamp}");
@@ -137,6 +173,21 @@ namespace ETW
             }
         }
 
+        public static void AddOrUpdateProc(ProcessStatus elem)
+        {
+            if (suspicions.ContainsKey(elem.ProcessID))
+            {
+                suspicions[elem.ProcessID].
+            }
+            else
+            {
+                var bag = new ConcurrentBag<InternalEvent>();
+                bag.Add(elem);
+                suspicions.TryAdd(elem.ProcessID, bag);
+
+            }
+        }
+
         public static void AddEvent(FileEvent elem)
         {
             if (dictFileEvents.ContainsKey(elem.FileName))
@@ -150,6 +201,12 @@ namespace ETW
                 dictFileEvents.TryAdd(elem.FileName, bag);
 
             }
+        }
+
+        private static void AddOrUpdate(ConcurrentDictionary<object, object> dict, object elem)
+        {
+
+
         }
     }
 
