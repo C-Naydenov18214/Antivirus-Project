@@ -69,12 +69,23 @@ namespace ETW
             AutoResetEvent.WaitAll(events.ToArray());
             killer.Result();
             Console.ReadLine();*/
+            List<FileEvent> dllList = new List<FileEvent>(100);
+            List<FileEvent> wrList = new List<FileEvent>(100);
+            for (int i = 0; i < 100; i++)
+            {
+                dllList.Add(new FileEvent("Image/Load", i, $"some name {i}", $"some File {i}", (ulong) i, i));
+                wrList.Add(new FileEvent("FileIO/Write", i, $"some name {i}", $"some File {i}", (ulong)i, i));
 
+            }
             var eventTracer = new EventTracer(Console.Out);
             var task = Task.Run(eventTracer.Test);
             Thread.Sleep(1000);
-            var procGroups = eventTracer.mergedGroups;
+            var dllObs = dllList.ToObservable();
+            var wrObs = wrList.ToObservable();
+
+            var procGroups = dllObs.Merge(wrObs).GroupBy(el => el.FileName);//eventTracer.mergedGroups;
             Tests.TestVarient(procGroups);
+            Console.WriteLine("HERE");
             //procGroups.Subscribe(group => ProcessGroup(group));
             task.Wait();
             /*int i = 0;
