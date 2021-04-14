@@ -22,22 +22,41 @@ namespace ETW
                 return r;
 
             }).Merge();//   Subscribe(g => ProcessGroup(g));
-            var dlls = groupedByProcID.Select(elem =>
+            var dllsProcID = groupedByProcID.Select(procElems =>
             {
-                var tmp = elem.Select(el => el);
-                var res = tmp.Where(el => el.EventName.CompareTo(image) == 0);
+                var tmp = procElems.Select(el => el);
+                var res = tmp.Where(el => el.EventName.CompareTo(image) == 0).GroupBy(elem => elem.ProcessID);
                 return res;
             }).Merge();
-            var writes = groupedByProcID.Select(elem =>
+            var writesProcID = groupedByProcID.Select(procElem =>
             {
-                var tmp = elem.Select(el => el);
-                var res = tmp.Where(el => el.EventName.CompareTo(write) == 0);
+                var tmp = procElem.Select(el => el);
+                var res = tmp.Where(el => el.EventName.CompareTo(write) == 0).GroupBy(elem => elem.ProcessID);
                 return res;
             }).Merge();
             
-            dlls.Subscribe(w => Console.WriteLine($"\t{w.ProcessID} : {w.ProcessName} : {w.EventName} : {w.TimeStamp}"));
-            writes.Subscribe(w => Console.WriteLine($"\t{w.ProcessID} : {w.ProcessName} : {w.EventName} : {w.TimeStamp}"));
-            dlls.CombineLatest(writes,ConcatFunc);
+            //var merged = dllsProcID.Merge(writesProcID);
+
+            /*dllsProcID.Subscribe(el =>
+            {
+                Console.WriteLine("Key = " + el.Key);
+                el.Subscribe(w => Console.WriteLine($"\t{w.ProcessID} : {w.ProcessName} : {w.EventName} : {w.TimeStamp}"));
+            });*/
+            //dlls.Subscribe(w => Console.WriteLine($"\t{w.ProcessID} : {w.ProcessName} : {w.EventName} : {w.TimeStamp}"));
+            //writes.Subscribe(w => Console.WriteLine($"\t{w.ProcessID} : {w.ProcessName} : {w.EventName} : {w.TimeStamp}"));
+
+            //var resultEvents = dllsProcID.   C .CombineLatest(writesProcID,ConcatFunc);
+            //resultEvents.Subscribe(el => PrintResultEvent(el));
+        }
+
+
+        public static void PrintResultEvent(ResultEvent eve) 
+        {
+            var w = eve.DllEvent;
+            var w1 = eve.WriteEvent;
+            Console.WriteLine($"\t{w.ProcessID} : {w.ProcessName} : {w.EventName} : {w.TimeStamp} <------> {w1.ProcessID} : {w1.ProcessName} : {w1.EventName} : {w1.TimeStamp}");
+
+
         }
 
         public static ResultEvent ConcatFunc(FileEvent dll, FileEvent write)

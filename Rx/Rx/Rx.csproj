@@ -84,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainClass.cs" />
+    <Compile Include="MainModule\ConcatedStreams.cs" />
     <Compile Include="MainModule\FileEvent.cs" />
     <Compile Include="MainModule\ProcessStatus.cs" />
     <Compile Include="MainModule\ResultEvent.cs" />
