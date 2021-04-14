@@ -74,9 +74,10 @@ namespace ETW
             var task = Task.Run(eventTracer.Test);
             Thread.Sleep(1000);
             var procGroups = eventTracer.mergedGroups;
-            procGroups.Subscribe(group => ProcessGroup(group));
+            Tests.TestVarient(procGroups);
+            //procGroups.Subscribe(group => ProcessGroup(group));
             task.Wait();
-            int i = 0;
+            /*int i = 0;
             Console.WriteLine($"Process count = {dictFileEvents.Count}");
             foreach (var dictElem in dictFileEvents)
             {
@@ -86,9 +87,13 @@ namespace ETW
                     Console.WriteLine($"\t{bag.ProcessID} {bag.ProcessName} {bag.EventName} {bag.TimeStamp}");
                 }
 
-            }
+            }*/
             Console.ReadLine();
         }
+
+
+
+
 
 
         /*public static void TestProcessGroup(IGroupedObservable<int, InternalEvent> group)
@@ -126,7 +131,7 @@ namespace ETW
 
         private static void AnalyzeWindow(IObservable<FileEvent> window)
         {
-            window.GroupBy(i => i.ProcessID).Subscribe(g => ProcessGroup(g));//.Subscribe для обработки одельного элемента;
+            var v = window.GroupBy(i => i.ProcessID).Subscribe(g => ProcessGroup(g));//.Subscribe для обработки одельного элемента;
             //window.Subscribe(w => AnalyzeGroupElement(w));
         }
         public static void ProcessGroup(IGroupedObservable<int, FileEvent> group)
@@ -169,21 +174,6 @@ namespace ETW
                 var bag = new ConcurrentBag<InternalEvent>();
                 bag.Add(elem);
                 dict.TryAdd(elem.ProcessID, bag);
-
-            }
-        }
-
-        public static void AddOrUpdateProc(ProcessStatus elem)
-        {
-            if (suspicions.ContainsKey(elem.ProcessID))
-            {
-                suspicions[elem.ProcessID].
-            }
-            else
-            {
-                var bag = new ConcurrentBag<InternalEvent>();
-                bag.Add(elem);
-                suspicions.TryAdd(elem.ProcessID, bag);
 
             }
         }
