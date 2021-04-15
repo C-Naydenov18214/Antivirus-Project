@@ -85,7 +85,7 @@ namespace ETW
 
             var procGroups = dllObs.Merge(wrObs).GroupBy(el => el.FileName);//eventTracer.mergedGroups;
             Tests.TestVarient(procGroups);
-            Console.WriteLine("HERE");
+            Console.WriteLine("Wait");
             //procGroups.Subscribe(group => ProcessGroup(group));
             task.Wait();
             /*int i = 0;

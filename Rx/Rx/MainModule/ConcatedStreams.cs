@@ -17,7 +17,7 @@ namespace Rx.MainModule
         {
             this.Dll = dll;
             this.Writers = writers;
-       
+           
         }
 
     }

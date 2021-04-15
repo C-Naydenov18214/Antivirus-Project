@@ -14,7 +14,7 @@ namespace ETW
         public static string write = "FileIO/Write";
 
         public static void TestVarient(IObservable<IGroupedObservable<string, FileEvent>> groupedByFile)
-        { 
+        {
             var groupedByProcID = groupedByFile.Select(gElem =>
             {
                 var res = gElem.Select(elem => elem);
@@ -35,28 +35,22 @@ namespace ETW
                 return res;
             }).Merge();
 
-            var zipped = Observable.When(dllsProcID.And(writesProcID).Then((dll, wr) => ConcatFunc(dll, wr)));// dllsProcID.And(write)
-            var rezz = zipped.Select(zip =>
-            {
-                var dll = zip.Dll.Select(el => el);
-                var wr = zip.Writers.Select(el => el);
-                var res = dll.CombineLatest(wr,ConcatFunc);
-
-                return res;
 
 
-            }).Merge();
-            rezz.Subscribe(el => PrintResultEvent(el));
-
-            //dllsProcID.CombineLatest(writesProcID, ConcatFunc);
-
+            //var comb = dllsProcID.CombineLatest(writesProcID, ConcatFunc);
+            //comb.Subscribe(Prin)
 
             //var merged = dllsProcID.Merge(writesProcID);
-            groupedByProcID.Subscribe(el =>
+
+            /*дебаг статистики последовательностей*/
+            
+            /*groupedByProcID.Subscribe(el =>
             {
                 Console.WriteLine("Key = " + el.Key);
                 el.Subscribe(w => Console.WriteLine($"by id \t{w.ProcessID} : {w.ProcessName} : {w.EventName} : {w.TimeStamp}"));
             });
+
+
             groupedByFile.Subscribe(el =>
             {
                 Console.WriteLine("Key = " + el.Key);
@@ -64,14 +58,52 @@ namespace ETW
             });
             dllsProcID.Subscribe(el =>
             {
-                Console.WriteLine("Key = " + el.Key);
-                el.Subscribe(w => Console.WriteLine($"\t{w.ProcessID} : {w.ProcessName} : {w.EventName} : {w.TimeStamp}"));
+                el.Count().Subscribe(c => Console.WriteLine($"Dll {el.Key} counter = {c}"));
             });
-            //dlls.Subscribe(w => Console.WriteLine($"\t{w.ProcessID} : {w.ProcessName} : {w.EventName} : {w.TimeStamp}"));
             writesProcID.Subscribe(el => {
-                Console.WriteLine("Key = " + el.Key);
-                el.Subscribe(w => Console.WriteLine($"\t{w.ProcessID} : {w.ProcessName} : {w.EventName} : {w.TimeStamp}"));
-            });
+                el.Count().Subscribe(c => Console.WriteLine($"WR {el.Key} counter = {c}"));
+
+            });*/
+
+
+
+            var zipped = Observable.When(writesProcID.And(dllsProcID).Then((dll, wr) =>
+            {
+                return ConcatFunc(dll, wr);
+            })).Select(concated =>
+            {
+                //Console.WriteLine($"\tin zipped dll = {concated.Dll.Key}, wr = {concated.Writers.Key}");
+                /*
+                 * var dll = concated.Dll.Select(el => el).CombineLatest(concated.Writers.Select(el => el),ConcatFunc);
+                 * return dll;
+                 * сокращеный вариант
+                 */
+                var dll = concated.Dll.Select(el => el);
+                dll.Count().Subscribe(el => Console.WriteLine($"\tdll {concated.Dll.Key} in rezz = {el}")); // <- вот тут всегда нет dll элемента
+                var wr = concated.Writers.Select(el => el);
+                wr.Count().Subscribe(el => Console.WriteLine($"\twr {concated.Writers.Key} in rezz = {el}"));
+                var res = dll.CombineLatest(wr, ConcatFunc);
+
+                return res;
+
+
+            }).Merge().Subscribe(el => PrintResultEvent(el));
+            /*zipped.Count().Subscribe(el => Console.WriteLine($"\t \tzipped = {el}"));
+            var rezz = zipped.Select(concated =>
+            {
+                //Console.WriteLine($"\tin zipped dll = {concated.Dll.Key}, wr = {concated.Writers.Key}");
+                var dll = concated.Dll.Select(el => el);
+                dll.Count().Subscribe(el => Console.WriteLine($"\tdll {concated.Dll.Key} in rezz = {el}"));
+                var wr = concated.Writers.Select(el => el);
+                wr.Count().Subscribe(el => Console.WriteLine($"\twr {concated.Writers.Key} in rezz = {el}"));
+                var res = dll.CombineLatest(wr, ConcatFunc);
+
+                return res;
+
+
+            }).Merge();
+            rezz.Count().Subscribe(el => Console.WriteLine($"\t \trezz = {el}"));
+            rezz.Subscribe(el => PrintResultEvent(el));*/
 
             //var resultEvents = dllsProcID.   C .CombineLatest(writesProcID,ConcatFunc);
             //resultEvents.Subscribe(el => PrintResultEvent(el));
@@ -89,14 +121,17 @@ namespace ETW
 
         public static ResultEvent ConcatFunc(FileEvent dll, FileEvent write)
         {
+            Console.WriteLine($"proc = {dll.ProcessID} {dll.EventName} | {write.ProcessID} {write.EventName}");
             return new ResultEvent(dll, write);
         
         }
         public static ConcatedStreams ConcatFunc(IGroupedObservable<int, FileEvent> dll, IGroupedObservable<int, FileEvent> writers)
         {
-            Console.WriteLine($"Created {dll.Key} {writers.Key}");
+            //Console.WriteLine($"Created 1 {dll.Key} {writers.Key}");
             //dll.Count().Subscribe(c => Console.WriteLine(c));
             //dll.Subscribe(w => Console.WriteLine($"\t{w.ProcessID} : {w.ProcessName} : {w.EventName} : {w.TimeStamp}"));
+            dll.Count().Subscribe(el => Console.WriteLine($"\tdll {dll.Key} in ConcatFunc = {el}"));
+            writers.Count().Subscribe(el => Console.WriteLine($"\twr {writers.Key} in ConcatFunc = {el}"));
             return new ConcatedStreams(dll, writers);
 
         }
