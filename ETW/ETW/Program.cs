@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ETW.Tracer;
-using Microsoft.Diagnostics.Tracing;
-using Rx;
 using Rx.MainModule;
-using Rx.Observers;
 
 namespace ETW
 {
@@ -77,17 +72,18 @@ namespace ETW
                 wrList.Add(new FileEvent("FileIO/Write", i, $"some name {i}", $"some File {i}", (ulong)i, i));
 
             }
-            var eventTracer = new EventTracer(Console.Out);
-            var task = Task.Run(eventTracer.Test);
-            Thread.Sleep(1000);
+            //var eventTracer = new EventTracer(Console.Out);
+            //var task = Task.Run(eventTracer.Test);
+            //Thread.Sleep(1000);
             var dllObs = dllList.ToObservable();
             var wrObs = wrList.ToObservable();
 
             var procGroups = dllObs.Merge(wrObs).GroupBy(el => el.FileName);//eventTracer.mergedGroups;
-            Tests.TestVarient(procGroups);
+            //Tests.TestVarient(procGroups);
+            SelectManyTests.TestVarient(procGroups);
             Console.WriteLine("Wait");
             //procGroups.Subscribe(group => ProcessGroup(group));
-            task.Wait();
+            //task.Wait();
             /*int i = 0;
             Console.WriteLine($"Process count = {dictFileEvents.Count}");
             foreach (var dictElem in dictFileEvents)
@@ -99,7 +95,7 @@ namespace ETW
                 }
 
             }*/
-            Console.ReadLine();
+            //Console.ReadLine();
         }
 
 
