@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ETW
 {
-    class SelectManyTests
+    class WriteLoadPattern
     {
         public static void TestVarient(IObservable<IGroupedObservable<string, FileEvent>> byFiles)
         {
@@ -20,7 +20,7 @@ namespace ETW
             var writeObs = writeSubj;
 
             var byFile = loadObs.Merge<FileEvent>(writeObs)
-                .Do(x => Console.WriteLine($"merge: {x.FileName}"))
+                /*.Do(x => Console.WriteLine($"merge: {x.FileName}"))*/
                 .GroupBy(el => el.FileName);
 
             byFile.SelectMany(fgr =>
@@ -32,35 +32,40 @@ namespace ETW
                     _ => Observable.Never<Unit>().TakeUntil(load.LastOrDefaultAsync().CombineLatest(write.LastOrDefaultAsync())),
                     (l, w) => (l, w))
                 .SelectMany(x => x.w.Aggregate(new HashSet<int>(), (acc, v) => { acc.Add(v.ProcessID); return acc; }, acc => new { fname = x.l.FileName, loadBy = x.l.ProcessID, writes = acc }))
-                .Where(x => x.writes.Contains(x.loadBy) &&  x.writes.Count != 0);
+                .Where(x => x.writes.Contains(x.loadBy) && x.writes.Count != 0);
             }).Subscribe(x => Console.WriteLine($"-------\t{x.fname}\tload: {x.loadBy}\twrites: {String.Join(", ", x.writes.Select(i => i.ToString()))}"));
-            for (int i = 0; i < 100; i++)
+            /*for (int i = 0; i < 10; i++)
             {
                 
                 writeSubj.OnNext(new FileEvent("FileIO/Write", i, $"proc name = {i}", $"File = {i}", (ulong)i, i));
+                writeSubj.OnNext(new FileEvent("FileIO/Write", i+1000, $"proc name = {i}", $"File = {i}", (ulong)i, i));
                 loadSubj.OnNext(new FileEvent("Image/Load", i, $"proc name = {i}", $"File = {i}", (ulong)i, i));
 
-            }
-            /*loadSubj.OnNext(new FileEvent("FileIO/Write", 1, $"proc name = {1}", $"a.exe", (ulong)1, 1));
-            loadSubj.OnNext(new FileEvent("Image/Load", 1, $"proc name = {1}", $"a.exe", (ulong)1, 1));
+            }*/
 
+
+            writeSubj.OnNext(new FileEvent("FileIO/Write", 1, $"proc name = {1}", $"a.exe", (ulong)1, 1));
+            
+            loadSubj.OnNext(new FileEvent("Image/Load", 1, $"proc name = {1}", $"a.exe", (ulong)1, 1));
+            
             writeSubj.OnNext(new FileEvent("FileIO/Write", 20, $"proc name = {1}", $"a.exe", (ulong)1, 1));
             writeSubj.OnNext(new FileEvent("FileIO/Write", 21, $"proc name = {2}", $"a.exe", (ulong)2, 2));
             writeSubj.OnNext(new FileEvent("FileIO/Write", 22, $"proc name = {3}", $"b.exe", (ulong)3, 3));
+            writeSubj.OnNext(new FileEvent("FileIO/Write", 4, $"proc name = {1}", $"a.exe", (ulong)1, 1));
             writeSubj.OnNext(new FileEvent("FileIO/Write", 23, $"proc name = {5}", $"b.exe", (ulong)4, 4));
             writeSubj.OnNext(new FileEvent("FileIO/Write", 24, $"proc name = {5}", $"c.exe", (ulong)5, 5));
-            
+
             loadSubj.OnNext(new FileEvent("Image/Load", 4, $"proc name = {4}", $"a.exe", (ulong)4, 4));
-            
+           
             writeSubj.OnNext(new FileEvent("FileIO/Write", 25, $"proc name = {7}", $"a.exe", (ulong)7, 7));
-            writeSubj.OnNext(new FileEvent("FileIO/Write", 666, $"proc name = {1}", $"a.exe", (ulong)1, 1));
-            loadSubj.OnNext(new FileEvent("Image/Load", 4, $"proc name = {66}", $"a.exe", (ulong)66, 66));
             
+            loadSubj.OnNext(new FileEvent("Image/Load", 4, $"proc name = {66}", $"a.exe", (ulong)66, 66));
             loadSubj.OnNext(new FileEvent("Image/Load", 5, $"proc name = {66}", $"d.exe", (ulong)66, 66));
             loadSubj.OnNext(new FileEvent("Image/Load", 6, $"proc name = {66}", $"b.exe", (ulong)66, 66));
 
+            
             loadSubj.OnCompleted();
-            writeSubj.OnCompleted();*/
+            writeSubj.OnCompleted();
 
         }
     }

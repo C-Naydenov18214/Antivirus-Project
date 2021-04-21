@@ -132,9 +132,10 @@ namespace ETW.Tracer
                 var dll = Observable.FromEvent<ImageLoadTraceData>(h => _kernelSession.Source.Kernel.ImageLoad += h, h => _kernelSession.Source.Kernel.ImageLoad -= h)/*.Where(i => i.FileName.EndsWith(".dll"))*/.Select(i => Transformer.TransformToFileEvent(i));
                 var write = Observable.FromEvent<FileIOReadWriteTraceData>(h => _kernelSession.Source.Kernel.FileIOWrite += h, h => _kernelSession.Source.Kernel.FileIOWrite -= h)/*.Where(i => i.FileName.EndsWith(".dll"))*/.Select(i => Transformer.TransformToFileEvent(i));
                 //var read = Observable.FromEvent<FileIOReadWriteTraceData>(h => _kernelSession.Source.Kernel.FileIORead += h, h => _kernelSession.Source.Kernel.FileIORead -= h)/*.Where(i => i.FileName.EndsWith(".dll"))*/.Select(i => Transformer.TransformToFileEvent(i));
-
+                var close = Observable.FromEvent<FileIOSimpleOpTraceData>(h => _kernelSession.Source.Kernel.FileIOClose += h, h => _kernelSession.Source.Kernel.FileIOClose -= h);/*.Where(i => i.FileName.EndsWith(".dll"))*///.Select(i => Transformer.TransformToFileEvent(i));
+                close.Subscribe(el => Console.WriteLine(el.EventName));
                 mergedGroups = dll.Merge(write).GroupBy(i => i.FileName);
-
+             
                 _kernelSession.Source.Process();
             }
 

@@ -25,6 +25,10 @@ namespace Rx.MainModule
                 return new FileEvent(evRW.EventName, evRW.ProcessID, evRW.ProcessName, evRW.FileName, evRW.FileKey, evRW.TimeStampRelativeMSec);
 
             }
+            if (data is FileIOSimpleOpTraceData evClose)
+            {
+                return new FileEvent(evClose.EventName, evClose.ProcessID, evClose.ProcessName, evClose.FileName, evClose.FileKey, evClose.TimeStampRelativeMSec);
+            }
 
             throw new Exception("Faild to create FileEvent");
         }

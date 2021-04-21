@@ -76,7 +76,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SelectManyTests.cs" />
+    <Compile Include="ReadWritePattern.cs" />
+    <Compile Include="WriteLoadPattern.cs" />
     <Compile Include="Tests.cs" />
     <Compile Include="Tracer\EventTracer.cs" />
     <Compile Include="Program.cs" />
