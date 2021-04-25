@@ -82,6 +82,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Patterns\Cript.cs" />
     <Compile Include="Patterns\ReadWritePattern.cs" />
     <Compile Include="Patterns\WriteLoadPattern.cs" />
     <Compile Include="Patterns\Tests.cs" />

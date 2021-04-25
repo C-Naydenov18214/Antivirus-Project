@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ETW.Patterns;
 using ETW.Tracer;
 using Rx.MainModule;
 
@@ -81,7 +82,8 @@ namespace ETW
             var procGroups = dllObs.Merge(wrObs).GroupBy(el => el.FileName);//eventTracer.mergedGroups;
             //Tests.TestVarient(procGroups);
             //WriteLoadPattern.TestVarient(procGroups);
-            ReadWritePattern.TestVarient(procGroups);
+            //ReadWritePattern.TestVarient(procGroups);
+            Cript.Test();
             //Console.WriteLine("Wait");
             //procGroups.Subscribe(group => ProcessGroup(group));
             //task.Wait();
