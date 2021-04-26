@@ -25,7 +25,7 @@ namespace Rx.MainModule
             TimeStamp = timeStamp;
             ThreadID = threadID;
         }
-        public FileEvent(string eventName, int processID, string processName, string fileName,double timeStamp)
+        public FileEvent(string eventName, int processID, string processName, string fileName, double timeStamp)
         {
             EventName = eventName;
             ProcessID = processID;
@@ -41,6 +41,11 @@ namespace Rx.MainModule
             FileName = fileName;
             FileKey = fileKey;
             TimeStamp = timeStamp;
+        }
+
+        public override string ToString()
+        {
+            return $"ProcessID= {ProcessID}, Action= {EventName}";
         }
 
 
