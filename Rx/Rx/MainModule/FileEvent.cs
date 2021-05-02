@@ -8,13 +8,13 @@ namespace Rx.MainModule
 {
     public class FileEvent
     {
-        public string FileName { get; }
-        public string ProcessName { get; }
-        public int ProcessID { get; }
-        public int ThreadID { get; }
-        public double TimeStamp { get; set; }
-        public string EventName { get; set; }
-        public ulong FileKey { get; }
+        public virtual string FileName { get; }
+        public virtual string ProcessName { get; }
+        public virtual int ProcessID { get; }
+        public virtual int ThreadID { get; }
+        public virtual double TimeStamp { get; set; }
+        public virtual string EventName { get; set; }
+        public virtual ulong FileKey { get; }
 
         public FileEvent(string eventName, int threadID, int processID, string processName, string fileName, double timeStamp)
         {

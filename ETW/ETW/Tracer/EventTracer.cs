@@ -138,10 +138,11 @@ namespace ETW.Tracer
              
                 _kernelSession.Source.Process();
             }
-
-
+            
+           
         }
-
+        
+        
         /*public InternalEvent Transform(TraceEvent data)
         {
             return new InternalEvent(data.ID, data.EventName, data.ProcessID, data.TimeStampRelativeMSec);
