@@ -13,7 +13,7 @@ namespace ETW.Tracer
     /// <summary>
     /// Kernel event listener.
     /// </summary>
-    class EventTracer
+    public class EventTracer
     {
         private readonly TextWriter _out;
         private TraceEventSession _kernelSession;
