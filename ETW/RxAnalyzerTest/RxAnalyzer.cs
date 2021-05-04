@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
 using App;
@@ -11,10 +12,10 @@ namespace RxAnalyzerTest
 {
     public class RxAnalyzer : ARxAnalyzer
     {
-        private IObservable<WriteEvent> wObservable;
-        private IObservable<ReadEvent> rObservable;
+        private Subject<WriteEvent> wObservable;
+        private Subject<ReadEvent> rObservable;
 
-        public RxAnalyzer(IObservable<WriteEvent> wObservable, IObservable<ReadEvent> rObservable, IObservable<SuspiciousEvent> suspiciousEvents) : base(suspiciousEvents)
+        public RxAnalyzer(Subject<WriteEvent> wObservable, Subject<ReadEvent> rObservable, Subject<SuspiciousEvent> suspiciousEvents) : base(suspiciousEvents)
         {
             this.wObservable = wObservable;
             this.rObservable = rObservable;

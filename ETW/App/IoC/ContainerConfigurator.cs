@@ -17,7 +17,7 @@ namespace App.IoC
                 new ContainerControlledLifetimeManager());
         }
 
-        public static void Configure(IUnityContainer container, IObservable<SuspiciousEvent> suspiciousEvents)
+        public static void Configure(IUnityContainer container, Subject<SuspiciousEvent> suspiciousEvents)
         {
             container.RegisterType<IObservable<WriteEvent>, Subject<WriteEvent>>(
                 new ContainerControlledLifetimeManager());

@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Subjects;
 
 namespace Kit
 {
     public abstract class ARxAnalyzer
     {
-        public readonly IObservable<SuspiciousEvent> SuspiciousEvents;
+        public readonly Subject<SuspiciousEvent> SuspiciousEvents;
 
-        protected ARxAnalyzer(IObservable<SuspiciousEvent> suspiciousEvents)
+        protected ARxAnalyzer(Subject<SuspiciousEvent> suspiciousEvents)
         {
             SuspiciousEvents = suspiciousEvents;
         }
