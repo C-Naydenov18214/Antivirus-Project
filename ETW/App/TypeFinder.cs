@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Kit;
 
 namespace App
 {
     public class TypeFinder
     {
-        public static Type GetType(Assembly assembly, string interfaceName)
+        public static Type GetType(Assembly assembly)
         {
             var types = assembly.GetTypes();
 
-            return (from type in types let analyzer = type.GetInterface(interfaceName) where analyzer != null select type).FirstOrDefault();
+            return types.FirstOrDefault(t => t.IsSubclassOf(typeof(ARxAnalyzer)));
         }
     }
 }

@@ -41,9 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IRxAnalyzer.cs" />
+    <Compile Include="ARxAnalyzer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReadEvent.cs" />
+    <Compile Include="SuspiciousEvent.cs" />
     <Compile Include="WriteEvent.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

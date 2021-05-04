@@ -2,6 +2,7 @@
 using System.Reactive.Subjects;
 using Kit;
 using Unity;
+using Unity.Injection;
 using Unity.Lifetime;
 
 namespace App.IoC
@@ -14,6 +15,15 @@ namespace App.IoC
                 new ContainerControlledLifetimeManager());
             container.RegisterType<IObservable<ReadEvent>, Subject<ReadEvent>>(
                 new ContainerControlledLifetimeManager());
+        }
+
+        public static void Configure(IUnityContainer container, IObservable<SuspiciousEvent> suspiciousEvents)
+        {
+            container.RegisterType<IObservable<WriteEvent>, Subject<WriteEvent>>(
+                new ContainerControlledLifetimeManager());
+            container.RegisterType<IObservable<ReadEvent>, Subject<ReadEvent>>(
+                new ContainerControlledLifetimeManager());
+            container.RegisterInstance(suspiciousEvents, new ContainerControlledLifetimeManager());
         }
     }
 }
