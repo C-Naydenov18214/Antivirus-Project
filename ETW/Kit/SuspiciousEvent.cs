@@ -2,6 +2,6 @@
 {
     public class SuspiciousEvent
     {
-        
+        public int ProcessId;
     }
 }
