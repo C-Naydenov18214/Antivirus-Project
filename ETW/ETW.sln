@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RxAnalyzerTest", "RxAnalyze
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kit", "Kit\Kit.csproj", "{67DDC73E-05CF-40A3-BFBE-1D300A04BBE0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuspiciousProcess", "SuspiciousProcess\SuspiciousProcess.csproj", "{4C0ED2F0-F648-45FA-B662-4C2E4A32C8F6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{67DDC73E-05CF-40A3-BFBE-1D300A04BBE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67DDC73E-05CF-40A3-BFBE-1D300A04BBE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67DDC73E-05CF-40A3-BFBE-1D300A04BBE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C0ED2F0-F648-45FA-B662-4C2E4A32C8F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C0ED2F0-F648-45FA-B662-4C2E4A32C8F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C0ED2F0-F648-45FA-B662-4C2E4A32C8F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C0ED2F0-F648-45FA-B662-4C2E4A32C8F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

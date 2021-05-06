@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using ETW.Patterns;
 using ETW.Tracer;
+using Kit;
 using Rx.MainModule;
 
 namespace ETW
@@ -19,85 +22,22 @@ namespace ETW
         static Mutex mutex = new Mutex();
         private static void Main(string[] args)
         {
-
-            //MainClass.Main(null);
-            /*List<AutoResetEvent> events = new List<AutoResetEvent>(6);
-            for (int i = 0; i < 7; i++)
-            {
-                events.Add(new AutoResetEvent(false));
-            }
-
-            var first_f = new BaseObserver<InternalEvent, InternalEvent>(1, events[0]);
-            var second_f = new BaseObserver<InternalEvent, InternalEvent>(2, events[1]);
-
-            var first_s = new BaseObserver<InternalEvent, InternalEvent>(3, events[2]);
-            var second_s = new BaseObserver<InternalEvent, InternalEvent>(4, events[3]);
-
-            var first_t = new BaseObserver<InternalEvent, InternalEvent>(5, events[4]);
-            var second_t = new BaseObserver<InternalEvent, InternalEvent>(6, events[5]);
-
-            var killer = new Killer<InternalEvent, InternalEvent>(7, events[6]);
-
-            var dllInput = new BaseObservable<InternalEvent>();
-            var fwInput = new BaseObservable<InternalEvent>();
-            var frInput = new BaseObservable<InternalEvent>();
-
-            dllInput.ObserveOn(TaskPoolScheduler.Default).Subscribe(first_f);
-            first_f.ConnectTo(second_f);
-            second_f.ConnectTo(killer);
-
-            fwInput.ObserveOn(TaskPoolScheduler.Default).Subscribe(first_s);
-            first_s.ConnectTo(second_s);
-            second_s.ConnectTo(killer);
-
-            frInput.ObserveOn(TaskPoolScheduler.Default).Subscribe(first_t);
-            first_t.ConnectTo(second_t);
-            second_t.ConnectTo(killer);
-
             var eventTracer = new EventTracer(Console.Out);
-            eventTracer.SetInputs(dllInput, fwInput, frInput);
-            var task = Task.Run(eventTracer.Run);
-            task.Wait();
-            
-            dllInput.Stop();
-            fwInput.Stop();
-            frInput.Stop();
-            AutoResetEvent.WaitAll(events.ToArray());
-            killer.Result();
-            Console.ReadLine();*/
-            List<FileEvent> dllList = new List<FileEvent>(100);
-            List<FileEvent> wrList = new List<FileEvent>(100);
-            for (int i = 0; i < 100; i++)
-            {
-                dllList.Add(new FileEvent("Image/Load", i, $"some name {i}", $"some File {i}", (ulong) i, i));
-                wrList.Add(new FileEvent("FileIO/Write", i, $"some name {i}", $"some File {i}", (ulong)i, i));
-
-            }
-           // var eventTracer = new EventTracer(Console.Out);
-            //var task = Task.Run(eventTracer.Test);
-           // Thread.Sleep(1000);
-            var dllObs = dllList.ToObservable();
-            var wrObs = wrList.ToObservable();
-
-            var procGroups = dllObs.Merge(wrObs).GroupBy(el => el.FileName);//eventTracer.mergedGroups;
+            var task = Task.Run(eventTracer.Test);
+            Thread.Sleep(1000);
             //Tests.TestVarient(procGroups);
             //WriteLoadPattern.TestVarient(procGroups);
-            ReadWritePattern.TestVarient(procGroups);
+            //Создаем выходной потом подозрительных событий 
+            var sub = new Subject<SuspiciousEvent>();
+            //создаем анализатор с нужными событиями 
+            var analyzer = new TestAnalyzer(eventTracer.Dlls,sub);
+            analyzer.Start();
             //Cript.Test();
-            //Console.WriteLine("Wait");
-            //procGroups.Subscribe(group => ProcessGroup(group));
-            //task.Wait();
-            /*int i = 0;
-            Console.WriteLine($"Process count = {dictFileEvents.Count}");
-            foreach (var dictElem in dictFileEvents)
-            {
-                Console.WriteLine($"{i++}. Process ID = {dictElem.Key}");
-                foreach (var bag in dictElem.Value)
-                {
-                    Console.WriteLine($"\t{bag.ProcessID} {bag.ProcessName} {bag.EventName} {bag.TimeStamp}");
-                }
+            Console.WriteLine("Wait");
+            //подписываемся на выходной поток подозрительных событий, оно и без SubscribeOn работает 
+            sub.SubscribeOn(Scheduler.Default).Subscribe(e => Console.WriteLine($"Main Thread: {Thread.CurrentThread.ManagedThreadId} susp val = {e.ProcessId}"));
+            task.Wait();
 
-            }*/
             Console.ReadLine();
         }
 
@@ -159,8 +99,8 @@ namespace ETW
             }
             else
             {
-            
-            
+
+
             }
 
         }

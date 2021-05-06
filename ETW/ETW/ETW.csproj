@@ -84,9 +84,9 @@
   <ItemGroup>
     <Compile Include="Patterns\Cript.cs" />
     <Compile Include="Patterns\ReadWritePattern.cs" />
+    <Compile Include="Patterns\TestAnalyzer.cs" />
     <Compile Include="Patterns\WriteLoadPattern.cs" />
     <Compile Include="Patterns\Tests.cs" />
-    <Compile Include="Patterns\Wtf.cs" />
     <Compile Include="Tracer\EventTracer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -99,6 +99,10 @@
     <ProjectReference Include="..\..\Rx\Rx\Rx.csproj">
       <Project>{29bc334a-1c67-43da-a90e-3316d1b072a0}</Project>
       <Name>Rx</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Kit\Kit.csproj">
+      <Project>{67DDC73E-05CF-40A3-BFBE-1D300A04BBE0}</Project>
+      <Name>Kit</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

@@ -1,4 +1,6 @@
 ﻿using ETW.Patterns;
+using Kit;
+using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
 using Rx.MainModule;
 using System;
 using System.Collections.Generic;
@@ -19,7 +21,7 @@ namespace ETW
             var readSubj = new Subject<FileEvent>();
             var writeSubj = new Subject<FileEvent>();
             var closeSubj = new Subject<FileEvent>();
-
+            var suspSub = new Subject<int>();
             var byFile = readSubj.Merge<FileEvent>(writeSubj).Merge(closeSubj)
                 .Do(x => Console.WriteLine($"merge: {x.FileName}"))
                 .GroupBy(el => el.FileName);
@@ -29,15 +31,19 @@ namespace ETW
                 var read = fgr.OfType<FR>().Publish().RefCount();
                 var write = fgr.OfType<FW>().Publish().RefCount();
                 var close = fgr.OfType<FC>().Publish().RefCount();
-                
-                var readWrite = ((read as IObservable<FileEvent>)).Merge((write as IObservable<FileEvent>));//fgr.Where(el => el.EventName.CompareTo("FileIO/Read") == 0 || el.EventName.CompareTo("FileIO/Write") == 0);//.Publish().RefCount();
+
+                var readWrite = ((read as IObservable<FileEvent>)).Merge(write);
                 return close.GroupJoin(readWrite,
                     _ => Observable.Timer(TimeSpan.FromTicks(1)),
                     _ => Observable.Timer(TimeSpan.FromMilliseconds(100)),//Never<Unit>().TakeUntil(close.LastOrDefaultAsync().CombineLatest(readWrite.LastOrDefaultAsync())),
-                    (cl,wr) => (cl,wr))
-                .SelectMany(x => x.wr.Aggregate(new HashSet<FileEvent> (), (acc, v) => { acc.Add(v); return acc; }, acc => new { fName = x.cl.FileName, closeBy = x.cl.ProcessID, actions = acc }))
+                    (cl, wr) => (cl, wr))
+                .SelectMany(x => x.wr.Aggregate(new HashSet<FileEvent>(), (acc, v) => { acc.Add(v); return acc; }, acc => new { fName = x.cl.FileName, closeBy = x.cl.ProcessID, actions = acc }))
                 .Where(x => x.actions.Count != 0);
-            }).Subscribe(x => Console.WriteLine($"-------\t{x.fName}\tclose: {x.closeBy}\tactions:\n\t{String.Join(",\n\t", x.actions.Select(i => i.ToString()))}"));
+            }).Subscribe(x =>
+            {
+                suspSub.OnNext(x.closeBy);
+                Console.WriteLine($"-------\t{x.fName}\tclose: {x.closeBy}\tactions:\n\t{String.Join(",\n\t", x.actions.Select(i => i.ToString()))}");
+            });
 
 
             //.Subscribe(x => Console.WriteLine($"-------\t{x.fname}\tread: {x.readBy}\twrites: {String.Join(", ", x.writes.Select(i => i.ToString()))}"));
@@ -49,15 +55,15 @@ namespace ETW
 
             }*/
             //x.writes.Contains(x.loadBy) &&
+            suspSub.Subscribe(x => Console.WriteLine($"**********************************susp closed by {x}"));
+            readSubj.OnNext(new FR("FileIO/Read", 0, 1, $"proc name = {1}", $"a.exe", 1));
+            readSubj.OnNext(new FR("FileIO/Read", 0, 21, $"proc name = {1}", $"b.exe", 1));
+            writeSubj.OnNext(new FW("FileIO/Write", 0, 1, $"proc name = {1}", $"a.exe", 1));
+            writeSubj.OnNext(new FW("FileIO/Write", 0, 5, $"proc name = {1}", $"b.exe", 1));
+            writeSubj.OnNext(new FW("FileIO/Write", 0, 6, $"proc name = {1}", $"b.exe", 1));
 
-            readSubj.OnNext(new FR("FileIO/Read", 0,1, $"proc name = {1}", $"a.exe",  1));
-            readSubj.OnNext(new FR("FileIO/Read", 0,21, $"proc name = {1}", $"b.exe",  1));
-            writeSubj.OnNext(new FW("FileIO/Write", 0,1, $"proc name = {1}", $"a.exe",  1));
-            writeSubj.OnNext(new FW("FileIO/Write", 0,5, $"proc name = {1}", $"b.exe",  1));
-            writeSubj.OnNext(new FW("FileIO/Write", 0,6, $"proc name = {1}", $"b.exe",  1));
-            
-            closeSubj.OnNext(new FC("FileIO/Close",0,1, $"proc name = {1}", $"a.exe",  1));
-            closeSubj.OnNext(new FC("FileIO/Close",0,5, $"proc name = {1}", $"b.exe",  1));
+            closeSubj.OnNext(new FC("FileIO/Close", 0, 1, $"proc name = {1}", $"a.exe", 1));
+            closeSubj.OnNext(new FC("FileIO/Close", 0, 5, $"proc name = {1}", $"b.exe", 1));
 
             /* writeSubj.OnNext(new FileEvent("FileIO/Write", 20, $"proc name = {1}", $"a.exe", (ulong)1, 1));
              writeSubj.OnNext(new FileEvent("FileIO/Write", 21, $"proc name = {2}", $"a.exe", (ulong)2, 2));
@@ -80,6 +86,7 @@ namespace ETW
         }
 
 
+
         class FW : FileEvent
         {
             public override string FileName { get; }
@@ -90,7 +97,7 @@ namespace ETW
             public override string EventName { get; set; }
             public override ulong FileKey { get; }
 
-            public FW(string eventName, int threadID, int processID, string processName, string fileName, double timeStamp) : base(eventName,threadID,processID,processName,fileName,timeStamp)
+            public FW(string eventName, int threadID, int processID, string processName, string fileName, double timeStamp) : base(eventName, threadID, processID, processName, fileName, timeStamp)
             {
                 EventName = eventName;
                 ProcessID = processID;
