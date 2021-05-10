@@ -7,6 +7,7 @@ using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using ETW.Patterns;
+using ETW.Patterns.Analyzer;
 using ETW.Tracer;
 using Kit;
 using Rx.MainModule;
@@ -30,8 +31,10 @@ namespace ETW
             //Создаем выходной потом подозрительных событий 
             var sub = new Subject<SuspiciousEvent>();
             //создаем анализатор с нужными событиями 
-            var analyzer = new TestAnalyzer(eventTracer.Dlls,sub);
-            analyzer.Start();
+            var dllAnalyzer = new DllLoadAnalyzer(eventTracer.Dlls,sub);
+            var createsAnalyzer = new CreateWriteAnalyzer(eventTracer.Creates, sub);
+            dllAnalyzer.Start();
+            createsAnalyzer.Start();
             //Cript.Test();
             Console.WriteLine("Wait");
             //подписываемся на выходной поток подозрительных событий, оно и без SubscribeOn работает 
