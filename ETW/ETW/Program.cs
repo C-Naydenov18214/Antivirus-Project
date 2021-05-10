@@ -32,7 +32,7 @@ namespace ETW
             var sub = new Subject<SuspiciousEvent>();
             //создаем анализатор с нужными событиями 
             var dllAnalyzer = new DllLoadAnalyzer(eventTracer.Dlls,sub);
-            var createsAnalyzer = new CreateWriteAnalyzer(eventTracer.Creates, sub);
+            var createsAnalyzer = new CreateWriteAnalyzer(eventTracer.Creates,eventTracer.Writes, sub);
             dllAnalyzer.Start();
             createsAnalyzer.Start();
             //Cript.Test();

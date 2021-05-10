@@ -22,7 +22,7 @@ namespace ETW.Tracer
         public IObservable<IGroupedObservable<string, FileEvent>> mergedGroups;
         public IObservable<ImageLoadTraceData> Dlls { get; private set; }
         public IObservable<FileIOCreateTraceData> Creates { get; private set; }
-
+        public IObservable<FileIOReadWriteTraceData> Writes { get; private set; }
         public EventTracer()
         {
             _out = Console.Out;
@@ -134,7 +134,7 @@ namespace ETW.Tracer
                 //Observable.Start<ImageLoadTraceData>(h => _kernelSession.Source.Kernel.ImageLoad += h, h => _kernelSession.Source.Kernel.ImageLoad -= h);
                 Dlls = Observable.FromEvent<ImageLoadTraceData>(h => _kernelSession.Source.Kernel.ImageLoad += h, h => _kernelSession.Source.Kernel.ImageLoad -= h).Publish().RefCount();
                 Creates = Observable.FromEvent<FileIOCreateTraceData>(h => _kernelSession.Source.Kernel.FileIOCreate += h, h => _kernelSession.Source.Kernel.FileIOCreate -= h).Publish().RefCount();
-                var write = Observable.FromEvent<FileIOReadWriteTraceData>(h => _kernelSession.Source.Kernel.FileIOWrite += h, h => _kernelSession.Source.Kernel.FileIOWrite -= h)/*.Where(i => i.FileName.EndsWith(".dll"))*/.Select(i => Transformer.TransformToFileEvent(i));
+                Writes = Observable.FromEvent<FileIOReadWriteTraceData>(h => _kernelSession.Source.Kernel.FileIOWrite += h, h => _kernelSession.Source.Kernel.FileIOWrite -= h).Publish().RefCount();/*.Where(i => i.FileName.EndsWith(".dll"))*//*.Select(i => Transformer.TransformToFileEvent(i));*/
                 //var read = Observable.FromEvent<FileIOReadWriteTraceData>(h => _kernelSession.Source.Kernel.FileIORead += h, h => _kernelSession.Source.Kernel.FileIORead -= h)/*.Where(i => i.FileName.EndsWith(".dll"))*/.Select(i => Transformer.TransformToFileEvent(i));
                 var close = Observable.FromEvent<FileIOSimpleOpTraceData>(h => _kernelSession.Source.Kernel.FileIOClose += h, h => _kernelSession.Source.Kernel.FileIOClose -= h);/*.Where(i => i.FileName.EndsWith(".dll"))*///.Select(i => Transformer.TransformToFileEvent(i));
                 //close.Subscribe(el => Console.WriteLine(el.EventName));
