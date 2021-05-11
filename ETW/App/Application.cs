@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using App.IoC;
 using Kit;
 using ETW.Tracer;
@@ -21,10 +25,16 @@ namespace App
         {
             var dashboard = new Dashboard();
             var eventTracer = new EventTracer();
-            SuspiciousEvents.Subscribe(ev => dashboard.AddOrUpdate(ev.ProcessId, 1));
+            var task = Task.Run(eventTracer.Test);
+            SuspiciousEvents.Subscribe(ev =>
+            {
+                dashboard.AddOrUpdate(ev.ProcessId, 1);
+                dashboard.Show();
+            });
+            //SuspiciousEvents.SubscribeOn(Scheduler.Default).Subscribe(e => Console.WriteLine($"Main Thread: {Thread.CurrentThread.ManagedThreadId} susp val = {e.ProcessId}"));
 
             IUnityContainer container = new UnityContainer();
-            ContainerConfigurator.Configure(container, SuspiciousEvents);
+            ContainerConfigurator.Configure(container, SuspiciousEvents, eventTracer);
 
             foreach (var value in args)
             {
@@ -33,6 +43,22 @@ namespace App
                 var analyzer = (ARxAnalyzer)container.Resolve(type);
                 analyzer.Start();
             }
+
+            var line = Console.ReadLine();
+            while (!line.Equals("stop"))
+            {
+                if (int.TryParse(line, out var id))
+                {
+                    dashboard.Kill(id);
+                }
+                else
+                {
+                    Console.WriteLine("Enter valid id");
+                }
+            }
+            Console.WriteLine("Stopping application...");
+            eventTracer.GetKernelSession()?.Dispose();
+
             Console.ReadKey();
         }
     }

@@ -19,6 +19,11 @@ namespace ETW.Tracer
         private TraceEventSession _kernelSession;
         private bool _isStopped;
 
+        public TraceEventSession GetKernelSession()
+        {
+            return _kernelSession;
+        }
+
         public IObservable<IGroupedObservable<string, FileEvent>> mergedGroups;
         public IObservable<ImageLoadTraceData> Dlls { get; private set; }
         public IObservable<FileIOCreateTraceData> Creates { get; private set; }
