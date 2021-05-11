@@ -5,16 +5,17 @@ using System.Reactive.Linq;
 using System;
 using System.Reactive.Concurrency;
 using System.Threading;
+using ETW.Provider;
 
-namespace ETW.Patterns
+namespace ETW.Patterns.Analyzer
 {
     public class DllLoadAnalyzer : ARxAnalyzer
     {
         private IObservable<ImageLoadTraceData> _loads;
 
-        public DllLoadAnalyzer(IObservable<ImageLoadTraceData> loads, Subject<SuspiciousEvent> suspiciousEvents) : base(suspiciousEvents)
+        public DllLoadAnalyzer(EventProvider<ImageLoadTraceData> loads, Subject<SuspiciousEvent> suspiciousEvents) : base(suspiciousEvents)
         {
-            this._loads = loads;
+            this._loads = loads.Events;
             Console.WriteLine("Test analyzer created");
         }
         public override void Start()
@@ -24,7 +25,7 @@ namespace ETW.Patterns
             {
                 if (e != null)
                 {
-                    Console.WriteLine($"Dll Analyzer Thread: {Thread.CurrentThread.ManagedThreadId} FILE = {e.FileName}");
+                    //Console.WriteLine($"Dll Analyzer Thread: {Thread.CurrentThread.ManagedThreadId} FILE = {e.FileName}");
                     //Console.WriteLine($"ID: {e.ProcessID} {e.ProcessName}");
                     var r = new SuspiciousEvent();
                     try

@@ -1,4 +1,5 @@
-﻿using Kit;
+﻿using ETW.Provider;
+using Kit;
 using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
 using System;
 using System.Collections.Generic;
@@ -17,10 +18,10 @@ namespace ETW.Patterns.Analyzer
     {
         private IObservable<FileIOCreateTraceData> _creates;
         private IObservable<FileIOReadWriteTraceData> _writes;
-        public CreateWriteAnalyzer(IObservable<FileIOCreateTraceData> creates, IObservable<FileIOReadWriteTraceData> writes, Subject<SuspiciousEvent> suspiciousEvents) : base(suspiciousEvents)
+        public CreateWriteAnalyzer(EventProvider<FileIOCreateTraceData> creates, EventProvider<FileIOReadWriteTraceData> writes, Subject<SuspiciousEvent> suspiciousEvents) : base(suspiciousEvents)
         {
-            this._creates = creates;
-            this._writes = writes;
+            this._creates = creates.Events;
+            this._writes = writes.Events;
             Console.WriteLine("Test analyzer created");
         }
         public override void Start()
@@ -50,9 +51,9 @@ namespace ETW.Patterns.Analyzer
 
             }).Subscribe(e =>
             {
-                Console.WriteLine($"Create Analyzer Thread: {Thread.CurrentThread.ManagedThreadId} FILE = {e.fname}");
+                //Console.WriteLine($"Create Analyzer Thread: {Thread.CurrentThread.ManagedThreadId} FILE = {e.fname}");
 
-                Console.WriteLine($"-------\t{e.fname}\tload: {e.writeBy}\twrites: {String.Join(", ", e.creates.Select(i => i.ToString()))}");
+                //Console.WriteLine($"-------\t{e.fname}\tload: {e.writeBy}\twrites: {String.Join(", ", e.creates.Select(i => i.ToString()))}");
                 var r = new SuspiciousEvent();
                 try
                 {

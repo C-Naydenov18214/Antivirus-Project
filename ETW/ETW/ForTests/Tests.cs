@@ -15,43 +15,38 @@ using Kit;
 using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
 using Rx.MainModule;
 
-namespace ETW
+namespace ETW.ForTests
 {
-    sealed class Program
+    class Tests
     {
-     
-        static int c = 0;
-        static Mutex mutex = new Mutex();
-        private static void Main(string[] args)
+        public static void Run()
         {
 
-            ETW.ForTests.Tests.Run();
-            
-            
-            /*var eventTracer = new EventTracer(Console.Out);
+            var eventTracer = new EventTracer(Console.Out);
 
             var task = Task.Run(eventTracer.Test);
             Thread.Sleep(1000);
-
+            Type dllAType = typeof(DllLoadAnalyzer);
+            Type createAType = typeof(CreateWriteAnalyzer);
             //Создаем выходной потом подозрительных событий 
             var sub = new Subject<SuspiciousEvent>();
-            var dllProvider = new EventProvider<ImageLoadTraceData>(eventTracer.AllEvents);
-            var writeProvider = new EventProvider<FileIOReadWriteTraceData>(eventTracer.AllEvents);
-            var createProvider = new EventProvider<FileIOCreateTraceData>(eventTracer.AllEvents);
+            var dllList = ReflectionKit.GetConstructerArgs(dllAType, eventTracer);
+            var createList = ReflectionKit.GetConstructerArgs(createAType, eventTracer);
+            //var dllAnalyzer = new DllLoadAnalyzer(((EventProvider<ImageLoadTraceData>)providers[0]).Events,sub);
 
-            var dllAnalyzer = new DllLoadAnalyzer(dllProvider, sub);
-            var createsAnalyzer = new CreateWriteAnalyzer(createProvider.Events, writeProvider.Events, sub);
-            dllAnalyzer.Start();
-            createsAnalyzer.Start();
-            Cript.Test();
+            object dllAnalyzer = Activator.CreateInstance(dllAType, dllList[0], sub);
+            object createAnalyzer = Activator.CreateInstance(createAType, createList[0],createList[1], sub);
+            dllAType.GetMethod("Start").Invoke(dllAnalyzer, null);
+            createAType.GetMethod("Start").Invoke(createAnalyzer, null);
             Console.WriteLine("Wait");
             //подписываемся на выходной поток подозрительных событий, оно и без SubscribeOn работает 
             sub.SubscribeOn(Scheduler.Default).Subscribe(e => Console.WriteLine($"Main Thread: {Thread.CurrentThread.ManagedThreadId} susp val = {e.ProcessId}"));
             task.Wait();
 
-            Console.ReadLine();*/
+            Console.ReadLine();
+
         }
+
+
     }
-
-
 }

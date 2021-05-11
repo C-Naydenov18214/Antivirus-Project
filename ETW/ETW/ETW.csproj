@@ -82,12 +82,15 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ForTests\Tests.cs" />
     <Compile Include="Patterns\Analyzers\CreateWriteAnalyzer.cs" />
     <Compile Include="Patterns\Cript.cs" />
     <Compile Include="Patterns\ReadWritePattern.cs" />
     <Compile Include="Patterns\Analyzers\DllLoadAnalyzer.cs" />
     <Compile Include="Patterns\WriteLoadPattern.cs" />
     <Compile Include="Patterns\Tests.cs" />
+    <Compile Include="Provider\EventProvider.cs" />
+    <Compile Include="Reflection\ReflectionKit.cs" />
     <Compile Include="Tracer\EventTracer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
