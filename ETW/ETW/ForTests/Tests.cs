@@ -26,16 +26,21 @@ namespace ETW.ForTests
 
             var task = Task.Run(eventTracer.Test);
             Thread.Sleep(1000);
+            //Получаем  типы анализаторов 
             Type dllAType = typeof(DllLoadAnalyzer);
             Type createAType = typeof(CreateWriteAnalyzer);
             //Создаем выходной потом подозрительных событий 
             var sub = new Subject<SuspiciousEvent>();
-            var dllList = ReflectionKit.GetConstructerArgs(dllAType, eventTracer);
-            var createList = ReflectionKit.GetConstructerArgs(createAType, eventTracer);
-            //var dllAnalyzer = new DllLoadAnalyzer(((EventProvider<ImageLoadTraceData>)providers[0]).Events,sub);
-
-            object dllAnalyzer = Activator.CreateInstance(dllAType, dllList[0], sub);
-            object createAnalyzer = Activator.CreateInstance(createAType, createList[0],createList[1], sub);
+            //Получаем провайдеров для контруктора анализатора
+            List<object> dllArgsList = ReflectionKit.GetConstructerArgs(dllAType, eventTracer);
+            List<object> createArgsList = ReflectionKit.GetConstructerArgs(createAType, eventTracer);
+            //добавляем выходной поток
+            dllArgsList.Add(sub);
+            createArgsList.Add(sub);
+            //создаем анализаторы 
+            object dllAnalyzer = Activator.CreateInstance(dllAType, args:dllArgsList.ToArray());
+            object createAnalyzer = Activator.CreateInstance(createAType, args:createArgsList.ToArray());
+            //статуем анализаторы 
             dllAType.GetMethod("Start").Invoke(dllAnalyzer, null);
             createAType.GetMethod("Start").Invoke(createAnalyzer, null);
             Console.WriteLine("Wait");
