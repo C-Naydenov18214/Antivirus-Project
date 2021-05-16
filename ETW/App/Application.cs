@@ -51,8 +51,8 @@ namespace App
                 Task.Run(analyzer.Start);
             }
 
-            /*var line = Console.ReadLine();
-            while (!line.Equals("stop"))
+            var line = Console.ReadLine();
+            while (!line.Equals("exit"))
             {
                 if (int.TryParse(line, out var id))
                 {
@@ -65,7 +65,7 @@ namespace App
                 }
             }
             Console.WriteLine("Stopping application...");
-            eventTracer.GetKernelSession()?.Dispose();*/
+            eventTracer.GetKernelSession()?.Dispose();
 
             Console.ReadKey();
         }
