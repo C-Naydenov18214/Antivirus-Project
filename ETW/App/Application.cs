@@ -61,6 +61,7 @@ namespace App
                 else
                 {
                     Console.WriteLine("Enter valid id");
+                    line = Console.ReadLine();
                 }
             }
             Console.WriteLine("Stopping application...");
