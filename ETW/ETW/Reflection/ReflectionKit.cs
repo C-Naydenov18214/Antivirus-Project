@@ -10,30 +10,29 @@ namespace ETW.Reflection
 {
     public class ReflectionKit
     {
-        public static List<Type> GetConstructeTypes(Type type) 
+        public static List<Type> GetConstructeTypes(Type type)
         {
             var res = new List<Type>();
             var constructers = type.GetConstructors();
-            foreach (var c in constructers)
+            var c = constructers.FirstOrDefault();
+
+            var parameters = c.GetParameters();
+            foreach (var p in parameters)
             {
-                var parameters = c.GetParameters();
-                foreach(var p in parameters)
-                {
-                    res.Add(p.ParameterType);
-                }    
+                res.Add(p.ParameterType);
             }
             return res;
 
         }
 
 
-        public static dynamic Convertt(dynamic src, Type dest) 
+        public static dynamic Convertt(dynamic src, Type dest)
         {
             return Convert.ChangeType(src, dest);
         }
 
 
-        public static List<object> GetConstructerArgs(Type analyzerType,EventTracer eventTracer)
+        public static List<object> GetConstructerArgs(Type analyzerType, EventTracer eventTracer)
         {
             var types = GetConstructeTypes(analyzerType);
             List<KeyValuePair<object, Type>> providersPair = new List<KeyValuePair<object, Type>>();
