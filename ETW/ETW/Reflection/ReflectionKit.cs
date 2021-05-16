@@ -10,11 +10,11 @@ namespace ETW.Reflection
 {
     public class ReflectionKit
     {
-        public static List<Type> GetConstructeTypes(Type type)
+        public static List<Type> GetConstructorTypes(Type type)
         {
             var res = new List<Type>();
-            var constructers = type.GetConstructors();
-            var c = constructers.FirstOrDefault();
+            var constructors = type.GetConstructors();
+            var c = constructors.FirstOrDefault();
 
             var parameters = c.GetParameters();
             foreach (var p in parameters)
@@ -26,15 +26,15 @@ namespace ETW.Reflection
         }
 
 
-        public static dynamic Convertt(dynamic src, Type dest)
+        public static dynamic Convert(dynamic src, Type dest)
         {
-            return Convert.ChangeType(src, dest);
+            return System.Convert.ChangeType(src, dest);
         }
 
 
-        public static List<object> GetConstructerArgs(Type analyzerType, EventTracer eventTracer)
+        public static List<object> GetConstructorArgs(Type analyzerType, EventTracer eventTracer)
         {
-            var types = GetConstructeTypes(analyzerType);
+            var types = GetConstructorTypes(analyzerType);
             List<KeyValuePair<object, Type>> providersPair = new List<KeyValuePair<object, Type>>();
             var providersArgs = types.GetRange(0, types.Count - 1);
             foreach (var t in providersArgs)
@@ -48,12 +48,11 @@ namespace ETW.Reflection
             List<object> providers = new List<object>(providersPair.Count);
             foreach (var p in providersPair)
             {
-                object provider = ReflectionKit.Convertt(p.Key, p.Value);
+                object provider = Convert(p.Key, p.Value);
                 providers.Add(provider);
             }
 
             return providers;
-
         }
     }
 }

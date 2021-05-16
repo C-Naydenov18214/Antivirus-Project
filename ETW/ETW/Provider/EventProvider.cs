@@ -5,30 +5,28 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity;
 
 namespace ETW.Provider
 {
-    public class EventProvider<EventType>
+    public class EventProvider<TEventType> : IEventProvider
     {
-        public IObservable<EventType> Events { get; private set; } 
+        public IObservable<TEventType> Events { get; private set; }
 
-        public EventProvider(IObservable<TraceEvent> events)
+        protected EventProvider(IObservable<TraceEvent> events)
         {
-            Events = events.OfType<EventType>();
+            Events = events.OfType<TEventType>();
         }
 
-        public void Subscribe() 
+        public void Subscribe(IUnityContainer container)
         {
-        
+            Console.WriteLine("Trying to register instance...");
+            container.RegisterInstance(Events);
         }
 
-        public void UnSubscribe()
+        public void Unsubscribe(IUnityContainer container)
         {
-        
-        
+            throw new NotImplementedException();
         }
-
-
-
     }
 }

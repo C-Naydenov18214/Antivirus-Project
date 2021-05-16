@@ -90,6 +90,7 @@
     <Compile Include="Patterns\WriteLoadPattern.cs" />
     <Compile Include="Patterns\Tests.cs" />
     <Compile Include="Provider\EventProvider.cs" />
+    <Compile Include="Provider\IEventProvider.cs" />
     <Compile Include="Reflection\ReflectionKit.cs" />
     <Compile Include="Tracer\EventTracer.cs" />
     <Compile Include="Program.cs" />

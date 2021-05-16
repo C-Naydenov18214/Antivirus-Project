@@ -6,16 +6,17 @@ using System.Text;
 using System.Threading.Tasks;
 using App;
 using Kit;
+using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
 using Unity;
 
 namespace RxAnalyzerTest
 {
     public class RxAnalyzer : ARxAnalyzer
     {
-        private Subject<WriteEvent> wObservable;
-        private Subject<ReadEvent> rObservable;
+        private IObservable<FileIOCreateTraceData> wObservable;
+        private IObservable<FileIOReadWriteTraceData> rObservable;
 
-        public RxAnalyzer(Subject<WriteEvent> wObservable, Subject<ReadEvent> rObservable, Subject<SuspiciousEvent> suspiciousEvents) : base(suspiciousEvents)
+        public RxAnalyzer(IObservable<FileIOCreateTraceData> wObservable, IObservable<FileIOReadWriteTraceData> rObservable, Subject<SuspiciousEvent> suspiciousEvents) : base(suspiciousEvents)
         {
             this.wObservable = wObservable;
             this.rObservable = rObservable;
@@ -23,13 +24,19 @@ namespace RxAnalyzerTest
 
         public override void Start()
         {
-            if (wObservable != null && rObservable != null && SuspiciousEvents != null)
+            if (wObservable != null)
             {
-                Console.WriteLine("Not null!");
+                Console.WriteLine("create not null!");
             }
-            else
+
+            if (rObservable != null)
             {
-                Console.WriteLine("Null found!");
+                Console.WriteLine("read not null!");
+            }
+
+            if (SuspiciousEvents != null)
+            {
+                Console.WriteLine("susp not null!");
             }
         }
     }

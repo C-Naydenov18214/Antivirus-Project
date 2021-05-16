@@ -32,8 +32,8 @@ namespace ETW.ForTests
             //Создаем выходной потом подозрительных событий 
             var sub = new Subject<SuspiciousEvent>();
             //Получаем провайдеров для контруктора анализатора
-            List<object> dllArgsList = ReflectionKit.GetConstructerArgs(dllAType, eventTracer);
-            List<object> createArgsList = ReflectionKit.GetConstructerArgs(createAType, eventTracer);
+            List<object> dllArgsList = ReflectionKit.GetConstructorArgs(dllAType, eventTracer);
+            List<object> createArgsList = ReflectionKit.GetConstructorArgs(createAType, eventTracer);
             //добавляем выходной поток
             dllArgsList.Add(sub);
             createArgsList.Add(sub);

@@ -7,6 +7,8 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using App.IoC;
+using ETW.Provider;
+using ETW.Reflection;
 using Kit;
 using ETW.Tracer;
 using Unity;
@@ -31,15 +33,20 @@ namespace App
                 dashboard.AddOrUpdate(ev.ProcessId, 1);
                 dashboard.Show();
             });
-            //SuspiciousEvents.SubscribeOn(Scheduler.Default).Subscribe(e => Console.WriteLine($"Main Thread: {Thread.CurrentThread.ManagedThreadId} susp val = {e.ProcessId}"));
 
             IUnityContainer container = new UnityContainer();
-            ContainerConfigurator.Configure(container, SuspiciousEvents, eventTracer);
+            ContainerConfigurator.Initialization(container, SuspiciousEvents);
 
             foreach (var value in args)
             {
                 var assembly = Assembly.LoadFile(value);
                 var type = TypeFinder.GetType(assembly);
+                var arguments = ReflectionKit.GetConstructorArgs(type, eventTracer);
+                foreach (var provider in arguments)
+                {
+                    var iProvider = provider as IEventProvider;
+                    iProvider?.Subscribe(container);
+                }
                 var analyzer = (ARxAnalyzer)container.Resolve(type);
                 analyzer.Start();
             }
