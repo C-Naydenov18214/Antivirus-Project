@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Kit;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,16 +8,16 @@ namespace App
 {
     public class Dashboard
     {
-        private readonly ConcurrentDictionary<int, int> _dictionary;
+        private readonly ConcurrentDictionary<int, KeyValuePair<SuspiciousEvent, int>> _dictionary;
 
         public Dashboard()
         {
-            _dictionary = new ConcurrentDictionary<int, int>();
+            _dictionary = new ConcurrentDictionary<int, KeyValuePair<SuspiciousEvent, int>>();
         }
 
-        public void AddOrUpdate(int key, int val)
+        public void AddOrUpdate(int key, KeyValuePair<SuspiciousEvent, int> val)
         {
-            _dictionary.AddOrUpdate(key, val, (oldKey, oldVal) => oldVal + 1);
+            _dictionary.AddOrUpdate(key, val, (oldKey, oldVal) => oldVal = new KeyValuePair<SuspiciousEvent, int>(oldVal.Key,oldVal.Value+1));
         }
 
         public void Kill(int id)
@@ -31,7 +32,7 @@ namespace App
             Console.WriteLine();
             foreach (var pair in _dictionary)
             {
-                Console.WriteLine("Process ID = {0}, Suspicious Events Count = {1}", pair.Key, pair.Value);
+                Console.WriteLine($"Process ID = {pair.Key}, Suspicious Events Count = {pair.Value.Value}, Event info: {pair.Value.Key.EventInfo}");
             }
         }
     }

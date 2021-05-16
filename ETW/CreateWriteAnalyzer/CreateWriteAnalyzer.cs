@@ -59,7 +59,8 @@ namespace CreateWriteAnalyzer
                 {
                   
                     r.ProcessId = e.writeBy;
-                    r.EventInfo = "Process created a file and wrote data to it";
+                    r.EventInfo = $"Process created a file and wrote data to it";
+                    r.Length = r.EventInfo.Length;
                     this.SuspiciousEvents.OnNext(r);
                 }
                 catch (NullReferenceException ex)

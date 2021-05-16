@@ -31,7 +31,7 @@ namespace App
             Thread.Sleep(1000);
             SuspiciousEvents.Subscribe(ev =>
             {
-                dashboard.AddOrUpdate(ev.ProcessId, 1);
+                dashboard.AddOrUpdate(ev.ProcessId, new KeyValuePair<SuspiciousEvent, int>(ev,1));
                 dashboard.Show();
             });
             IUnityContainer container = new UnityContainer();
