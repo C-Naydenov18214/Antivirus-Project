@@ -11,10 +11,15 @@ namespace App
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Enter path to DLL.");
+            Console.WriteLine("Enter paths to DLL. Type 's' to stop.");
+            var list = new List<string>();
             string path = Console.ReadLine();
-            args = new string[1];
-            args[0] = path;
+            while (path != "s")
+            {
+                list.Add(path);
+                path = Console.ReadLine();
+            }
+            args = list.Select(i => i.ToString()).ToArray();
             Application.Run(args);
         }
     }

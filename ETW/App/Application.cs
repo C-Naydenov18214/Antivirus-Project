@@ -48,7 +48,7 @@ namespace App
                     iProvider?.Subscribe(container);
                 }
                 var analyzer = (ARxAnalyzer)container.Resolve(type);
-                analyzer.Start();
+                Task.Run(analyzer.Start);
             }
 
             var line = Console.ReadLine();
