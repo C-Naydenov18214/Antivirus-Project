@@ -31,6 +31,7 @@ namespace ETW.Patterns.Analyzer
                     try
                     {
                         r.ProcessId = e.ProcessID;
+                        r.EventInfo = "Process loaded dll";
                         this.SuspiciousEvents.OnNext(r);
                     }
                     catch (NullReferenceException ex)
