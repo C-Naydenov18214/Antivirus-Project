@@ -13,7 +13,7 @@ namespace ETW.Provider
     {
         public IObservable<TEventType> Events { get; private set; }
 
-        protected EventProvider(IObservable<TraceEvent> events)
+        public EventProvider(IObservable<TraceEvent> events)
         {
             Events = events.OfType<TEventType>();
         }

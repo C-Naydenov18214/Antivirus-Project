@@ -28,12 +28,12 @@ namespace App
             var dashboard = new Dashboard();
             var eventTracer = new EventTracer();
             var task = Task.Run(eventTracer.Test);
+            Thread.Sleep(1000);
             SuspiciousEvents.Subscribe(ev =>
             {
                 dashboard.AddOrUpdate(ev.ProcessId, 1);
                 dashboard.Show();
             });
-
             IUnityContainer container = new UnityContainer();
             ContainerConfigurator.Initialization(container, SuspiciousEvents);
 
