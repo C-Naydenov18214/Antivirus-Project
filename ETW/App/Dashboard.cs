@@ -27,7 +27,7 @@ namespace App
         public void Show()
         {
             Console.Clear();
-            Console.WriteLine("Enter process id in order to kill it. Enter 'exit' to stop the program.");
+            Console.WriteLine("Enter process id in order to kill it. Enter 'load `path to dll`', or 'exit' to stop the program.");
             Console.WriteLine();
             foreach (var pair in _dictionary)
             {

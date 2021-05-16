@@ -39,26 +39,25 @@ namespace App
 
             foreach (var value in args)
             {
-                var assembly = Assembly.LoadFile(value);
-                var type = TypeFinder.GetType(assembly);
-                var arguments = ReflectionKit.GetConstructorArgs(type, eventTracer);
-                foreach (var provider in arguments)
-                {
-                    var iProvider = provider as IEventProvider;
-                    iProvider?.Subscribe(container);
-                }
-                var analyzer = (ARxAnalyzer)container.Resolve(type);
-                Task.Run(analyzer.Start);
+                LoadAnalyzer(value, eventTracer, container);
             }
 
+            Console.WriteLine("Please provide path to dll. Enter 'load `path to dll`'");
             var line = Console.ReadLine();
+            Console.WriteLine("Read line");
             while (!line.Equals("exit"))
             {
                 if (int.TryParse(line, out var id))
                 {
                     dashboard.Kill(id);
                 }
-                else
+                else if (line.Contains("load"))
+                {
+                    line = line.Replace("load", "").Replace(" ", "");
+                    LoadAnalyzer(line, eventTracer, container);
+                    line = Console.ReadLine();
+                }
+                else 
                 {
                     Console.WriteLine("Enter valid id");
                     line = Console.ReadLine();
@@ -68,6 +67,20 @@ namespace App
             eventTracer.GetKernelSession()?.Dispose();
 
             Console.ReadKey();
+        }
+
+        private static void LoadAnalyzer(string value, EventTracer eventTracer, IUnityContainer container)
+        {
+            var assembly = Assembly.LoadFile(value);
+            var type = TypeFinder.GetType(assembly);
+            var arguments = ReflectionKit.GetConstructorArgs(type, eventTracer);
+            foreach (var provider in arguments)
+            {
+                var iProvider = provider as IEventProvider;
+                iProvider?.Subscribe(container);
+            }
+            var analyzer = (ARxAnalyzer)container.Resolve(type);
+            Task.Run(analyzer.Start);
         }
     }
 }
