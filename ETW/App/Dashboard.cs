@@ -16,7 +16,7 @@ namespace App
 
         public void AddOrUpdate(int key, int val)
         {
-            _dictionary.AddOrUpdate(key, val, (oldKey, oldVal) => val + 1);
+            _dictionary.AddOrUpdate(key, val, (oldKey, oldVal) => oldVal + 1);
         }
 
         public void Kill(int id)

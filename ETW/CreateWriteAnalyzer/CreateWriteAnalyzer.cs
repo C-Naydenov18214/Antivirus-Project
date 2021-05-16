@@ -18,10 +18,10 @@ namespace CreateWriteAnalyzer
     {
         private IObservable<FileIOCreateTraceData> _creates;
         private IObservable<FileIOReadWriteTraceData> _writes;
-        public CreateWriteAnalyzer(EventProvider<FileIOCreateTraceData> creates, EventProvider<FileIOReadWriteTraceData> writes, Subject<SuspiciousEvent> suspiciousEvents) : base(suspiciousEvents)
+        public CreateWriteAnalyzer(IObservable<FileIOCreateTraceData> creates, IObservable<FileIOReadWriteTraceData> writes, Subject<SuspiciousEvent> suspiciousEvents) : base(suspiciousEvents)
         {
-            this._creates = creates.Events;
-            this._writes = writes.Events;
+            this._creates = creates;
+            this._writes = writes;
             Console.WriteLine("Test analyzer created");
         }
         public override void Start()
