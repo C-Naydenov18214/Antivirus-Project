@@ -53,8 +53,9 @@ namespace App
                 }
                 else if (line.Contains("load"))
                 {
-                    line = line.Replace("load", "").Replace(" ", "");
-                    LoadAnalyzer(line, eventTracer, container);
+                    //line = line.Replace("load", "").Replace(" ", "");
+
+                    LoadAnalyzer(line.Remove(0,5), eventTracer, container);
                     line = Console.ReadLine();
                 }
                 else 
