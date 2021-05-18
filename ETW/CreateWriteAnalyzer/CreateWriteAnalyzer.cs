@@ -28,8 +28,8 @@ namespace CreateWriteAnalyzer
         {
 
 
-            var streamC = _creates.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName });
-            var streamW = _writes.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName });
+            var streamC = _creates.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
+            var streamW = _writes.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
 
             var byFile = streamC.Merge(streamW).GroupBy(el => el.FName);
 
@@ -44,6 +44,7 @@ namespace CreateWriteAnalyzer
                 .SelectMany(x => x.w.Aggregate(new HashSet<int>(), (acc, v) => { acc.Add(v.PID); return acc; }, acc => new
                 {
                     fname = x.l.FName,
+                    procName = x.l.ProcName,
                     writeBy = x.l.PID,
                     creates = acc
                 }))
@@ -57,10 +58,11 @@ namespace CreateWriteAnalyzer
                 var r = new SuspiciousEvent();
                 try
                 {
-                  
+
                     r.ProcessId = e.writeBy;
                     r.EventInfo = $"Process created a file and wrote data to it";
                     r.Length = r.EventInfo.Length;
+                    r.ProcName = e.procName;
                     this.SuspiciousEvents.OnNext(r);
                 }
                 catch (NullReferenceException ex)

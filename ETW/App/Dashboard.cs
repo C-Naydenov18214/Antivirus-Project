@@ -32,7 +32,7 @@ namespace App
             Console.WriteLine();
             foreach (var pair in _dictionary)
             {
-                Console.WriteLine($"Process ID = {pair.Key}, Suspicious Events Count = {pair.Value.Value}, Event info: {pair.Value.Key.EventInfo}");
+                Console.WriteLine($"Process ID = {pair.Key}, Process name: {pair.Value.Key.ProcName}, Suspicious Events Count = {pair.Value.Value}, Event info: {pair.Value.Key.EventInfo}");
             }
         }
     }

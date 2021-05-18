@@ -5,6 +5,7 @@
         public int ProcessId;
         public string EventInfo;
         public int Length;
+        public string ProcName;
     }
 
 }

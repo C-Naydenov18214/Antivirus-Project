@@ -11,7 +11,7 @@ namespace App
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Enter paths to DLL. Type 's' to stop.");
+            Console.WriteLine("Enter paths to DLL. Type 's' to start.");
             var list = new List<string>();
             string path = Console.ReadLine();
             while (path != "s")

@@ -66,7 +66,7 @@ namespace App
             }
             Console.WriteLine("Stopping application...");
             eventTracer.GetKernelSession()?.Dispose();
-
+            Console.WriteLine("Application stopped\nPress any key to exit");
             Console.ReadKey();
         }
 
