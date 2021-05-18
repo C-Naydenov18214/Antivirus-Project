@@ -143,6 +143,7 @@ namespace ETW.Tracer
                 Creates = Observable.FromEvent<FileIOCreateTraceData>(h => _kernelSession.Source.Kernel.FileIOCreate += h, h => _kernelSession.Source.Kernel.FileIOCreate -= h).Publish().RefCount();
                 Writes = Observable.FromEvent<FileIOReadWriteTraceData>(h => _kernelSession.Source.Kernel.FileIOWrite += h, h => _kernelSession.Source.Kernel.FileIOWrite -= h).Publish().RefCount();/*.Where(i => i.FileName.EndsWith(".dll"))*//*.Select(i => Transformer.TransformToFileEvent(i));*/
                 AllEvents = Observable.FromEvent<TraceEvent>(h => _kernelSession.Source.Kernel.All += h, h => _kernelSession.Source.Kernel.All -= h).Publish().RefCount();
+                //Observable.FromEvent<FileIOInfoTraceData>(h => _kernelSession.Source.Kernel.FileIODelete += h, h => _kernelSession.Source.Kernel.FileIODelete -= h).Subscribe(e => Console.WriteLine(e.EventName));
 
 
                 //var read = Observable.FromEvent<FileIOReadWriteTraceData>(h => _kernelSession.Source.Kernel.FileIORead += h, h => _kernelSession.Source.Kernel.FileIORead -= h)/*.Where(i => i.FileName.EndsWith(".dll"))*/.Select(i => Transformer.TransformToFileEvent(i));

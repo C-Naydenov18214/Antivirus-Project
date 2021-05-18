@@ -15,11 +15,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kit", "Kit\Kit.csproj", "{6
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuspiciousProcess", "SuspiciousProcess\SuspiciousProcess.csproj", "{4C0ED2F0-F648-45FA-B662-4C2E4A32C8F6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReaderWriter", "ReaderWriter\ReaderWriter.csproj", "{627137FC-EA52-4E05-8683-4179F4501A7A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreatAndWrite", "ReaderWriter\CreatAndWrite.csproj", "{627137FC-EA52-4E05-8683-4179F4501A7A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateWriteAnalyzer", "CreateWriteAnalyzer\CreateWriteAnalyzer.csproj", "{960CB61A-08C7-491E-932C-ADEED512B860}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DllLoadAnalyzer", "DllLoadAnalyzer\DllLoadAnalyzer.csproj", "{6AF6B065-CBFD-44BC-ACFB-414E86520375}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadWriteDeleteAnalyzer", "ReadWriteDeleteAnalyzer\ReadWriteDeleteAnalyzer.csproj", "{EBECF209-E7D3-4905-B85A-E86C5FB34151}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadAndWrite", "ReadAndWrite\ReadAndWrite.csproj", "{BCD4EE87-7DFB-4FA4-92C0-66104B0C9252}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +67,14 @@ Global
 		{6AF6B065-CBFD-44BC-ACFB-414E86520375}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6AF6B065-CBFD-44BC-ACFB-414E86520375}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6AF6B065-CBFD-44BC-ACFB-414E86520375}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBECF209-E7D3-4905-B85A-E86C5FB34151}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBECF209-E7D3-4905-B85A-E86C5FB34151}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBECF209-E7D3-4905-B85A-E86C5FB34151}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBECF209-E7D3-4905-B85A-E86C5FB34151}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCD4EE87-7DFB-4FA4-92C0-66104B0C9252}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCD4EE87-7DFB-4FA4-92C0-66104B0C9252}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCD4EE87-7DFB-4FA4-92C0-66104B0C9252}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCD4EE87-7DFB-4FA4-92C0-66104B0C9252}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
