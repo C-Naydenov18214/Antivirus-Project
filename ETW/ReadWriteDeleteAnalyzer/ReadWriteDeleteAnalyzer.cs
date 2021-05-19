@@ -34,28 +34,29 @@ namespace ReadWriteDeleteAnalyzer
             byPid.SelectMany(pidGr =>
             {
                 string message = null;
-                var read = pidGr.Where(el => el.Action.CompareTo("FileIO/Read") == 0);//.Publish().RefCount();
-                var write = pidGr.Where(el => el.Action.CompareTo("FileIO/Write") == 0);//.Publish().RefCount();
-                var delete = pidGr.Where(el => el.Action.CompareTo("FileIO/Delete") == 0);
+                var read = pidGr.Where(el => el.Action.CompareTo("FileIO/Read") == 0).Publish().RefCount();
+                var write = pidGr.Where(el => el.Action.CompareTo("FileIO/Write") == 0).Publish().RefCount();
+                var delete = pidGr.Where(el => el.Action.CompareTo("FileIO/Delete") == 0).Publish().RefCount();
                 var firstPart = read.GroupJoin(write,
                     _ => Observable.Timer(TimeSpan.FromTicks(1)),
-                    _ => Observable.Timer(TimeSpan.FromMilliseconds(100)),//Never<Unit>().TakeUntil(write.LastOrDefaultAsync().CombineLatest(read.LastOrDefaultAsync())),
+                    _ => Observable.Never<Unit>().TakeUntil(read.LastOrDefaultAsync().CombineLatest(write.LastOrDefaultAsync())),
                     (w, r) => (w, r))
                 .SelectMany(x => x.r.Aggregate(new HashSet<int>(), (acc, v) => { acc.Add(v.PID); message = v.FName; return acc; }, acc => new
                 {
-                    FromName = message + x.w.FName,
+                    FromName = x.w.FName,
+                    ToFile = message,
                     procName = x.w.ProcName,
                     writeBy = x.w.PID,
                     creates = acc
-                }));
+                })).Publish().RefCount();
 
                 var res = delete.GroupJoin(firstPart,
                     _ => Observable.Timer(TimeSpan.FromTicks(1)),
-                    _ => Observable.Never<Unit>().TakeUntil(write.LastOrDefaultAsync().CombineLatest(read.LastOrDefaultAsync()).Where(a => a.First.FName.CompareTo(a.Second.FName) == 0)),
+                    _ => Observable.Never<Unit>().TakeUntil(delete.LastOrDefaultAsync().CombineLatest(firstPart.LastOrDefaultAsync())/*.Where(a => a.First.FName.CompareTo(a.Second.FromName) == 0)*/),
                     (d, r) => (d, r))
                     .SelectMany(x => x.r.Aggregate(new HashSet<int>(), (acc, v) => { acc.Add(v.writeBy); message = v.FromName; return acc; }, acc => new
                     {
-                        FromName = "\n\t" + x.d.FName + " read -> " + message + " delete -> " + x.d.FName,
+                        FromName = $"\n\t read {message}-> write -> delete {x.d.FName}",
                         procName = x.d.ProcName,
                         writeBy = x.d.PID,
                         creates = acc

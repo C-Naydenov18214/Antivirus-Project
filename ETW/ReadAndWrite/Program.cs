@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ReadAndWrite
@@ -44,6 +45,7 @@ namespace ReadAndWrite
                         
                     }
                     File.Delete(path);
+                    Thread.Sleep(1000);
                 }
             }
             catch (Exception e)
