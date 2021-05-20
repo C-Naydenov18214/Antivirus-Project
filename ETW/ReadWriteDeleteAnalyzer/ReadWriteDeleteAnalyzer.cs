@@ -30,48 +30,51 @@ namespace ReadWriteDeleteAnalyzer
             var streamW = _writes.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
             var streamR = _reads.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
             var streamD = _deletes.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
-            var byPid = streamR.Merge(streamW).Merge(streamD).GroupBy(el => el.PID);
+
+            var byPid = streamR.Merge(streamW).GroupBy(el => el.PID);
+            byPid = streamR.Merge(streamW).Merge(streamD).GroupBy(el => el.PID);
             byPid.SelectMany(pidGr =>
             {
                 string message = null;
-                var read = pidGr.Where(el => el.Action.CompareTo("FileIO/Read") == 0).Publish().RefCount();
-                var write = pidGr.Where(el => el.Action.CompareTo("FileIO/Write") == 0).Publish().RefCount();
-                var delete = pidGr.Where(el => el.Action.CompareTo("FileIO/Delete") == 0).Publish().RefCount();
-                var firstPart = write.GroupJoin(read,
-                    _ => Observable.Timer(TimeSpan.FromTicks(1)),
-                    _ => Observable.Never<Unit>().TakeUntil(write.LastOrDefaultAsync().CombineLatest(read.LastOrDefaultAsync())),
-                    (w, r) => (w, r))
-                .SelectMany(x => x.r.Aggregate(new HashSet<int>(), (acc, v) => { acc.Add(v.PID); message = v.FName; return acc; }, acc => new
+                var read = pidGr.Where(el => el.Action.CompareTo("FileIO/Read") == 0);
+                var write = pidGr.Where(el => el.Action.CompareTo("FileIO/Write") == 0);
+                var delete = pidGr.Where(el => el.Action.CompareTo("FileIO/Delete") == 0);
+                
+                
+                
+                
+                var firstPart = read.CombineLatest(write,
+                    (r,w) => (r,w))
+                .Select(x => new
                 {
-                    FName = x.w.FName,
+                    FName = x.r.FName,
                     ProcName = x.w.ProcName,
-                    PID = x.w.PID,
-                    writes = acc
-                })).Where(x => x.writes.Contains(x.PID) && x.writes.Count == 1);
+                    PID = x.r.PID,
+                    writes = x.w.FName
+                }).GroupBy(el => el.FName).SelectMany(gr =>
+                {
+                    return gr.FirstOrDefaultAsync();
+             
+                });
 
-                /*var res = delete.GroupJoin(firstPart,
-                    _ => Observable.Timer(TimeSpan.FromTicks(1)),
-                    _ => Observable.Never<Unit>().TakeUntil(delete.LastOrDefaultAsync().CombineLatest(firstPart.LastOrDefaultAsync())),
-                    (d, r) => (d, r))
-                    .SelectMany(x => x.r.Aggregate(new HashSet<int>(), (acc, v) => { acc.Add(v.PID); message = v.FName; return acc; }, acc => new
-                    {
-                        FromName = $"\n\t read {message}-> write -> delete {x.d.FName}",
-                        ProcName = x.d.ProcName,
-                        PID = x.d.PID,
-                        creates = acc
-                    })).Where(x => x.creates.Contains(x.PID) && x.creates.Count != 0);*/
-                return firstPart;//res;
+
+                var res = firstPart.CombineLatest(delete).Where(p => p.First.FName.CompareTo(p.Second.FName) == 0).Select(p => new
+                {
+                    PID = p.First.PID,
+                    FRead = p.First.FName,
+                    FDelet = p.Second.FName,
+                    FWrite = p.First.writes,
+                    ProcName = p.First.ProcName
+                });
+                return res;
 
             }).Subscribe(e =>
             {
-                //Console.WriteLine($"Create Analyzer Thread: {Thread.CurrentThread.ManagedThreadId} FILE = {e.fname}");
-
-                //Console.WriteLine($"-------\t{e.fname}\tload: {e.writeBy}\twrites: {String.Join(", ", e.creates.Select(i => i.ToString()))}");
                 var r = new SuspiciousEvent();
                 try
                 {
                     r.ProcessId = e.PID;
-                    r.EventInfo = e.FName;
+                    r.EventInfo = $"\tread {e.FRead} -> delete {e.FDelet} # caught write {e.FWrite}";
                     r.Length = r.EventInfo.Length;
                     r.ProcName = e.ProcName;
                     this.SuspiciousEvents.OnNext(r);
