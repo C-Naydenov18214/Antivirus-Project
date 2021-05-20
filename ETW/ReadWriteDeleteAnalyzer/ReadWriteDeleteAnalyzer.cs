@@ -41,6 +41,16 @@ namespace ReadWriteDeleteAnalyzer
                 var write = pidGr.Where(el => el.Action.CompareTo("FileIO/Write") == 0);
                 
                 var delete = pidGr.Where(el => el.Action.CompareTo("FileIO/Delete") == 0);
+                //gewge
+                var joined = read.GroupJoin(write,
+                    _ => Observable.Timer(TimeSpan.FromMilliseconds(100)),//Observable.Timer(TimeSpan.FromTicks(1)),
+                    _ => Observable.Never<Unit>().TakeUntil(read.LastOrDefaultAsync().CombineLatest(write.LastOrDefaultAsync())),
+                    (r, w) => (r, w))
+                .SelectMany(x => x.w.Aggregate(new HashSet<string>(), (acc, v) => { acc.Add(v.FName); return acc; }, acc => new { FName = x.r.FName,ProcName = x.r.ProcName ,PID = x.r.PID, writes = acc }))
+                .Where(x => x.writes.Count != 0);
+
+
+
 
                 var firstPart = read.CombineLatest(write,
                     (r, w) => (r, w))
@@ -68,12 +78,12 @@ namespace ReadWriteDeleteAnalyzer
 
             });
 
-                var res = firstPart.CombineLatest(delete).Where(p => p.First.FName.CompareTo(p.Second.FName) == 0).Select(p => new
+                var res = joined.CombineLatest(delete).Where(p => p.First.FName.CompareTo(p.Second.FName) == 0).Select(p => new
                 {
                     PID = p.First.PID,
                     FRead = p.First.FName,
                     FDelet = p.Second.FName,
-                    FWrite = p.First.writes,
+                    FWrite = String.Join("\n\t\t ", p.First.writes.Select(i => i)) ,
                     ProcName = p.First.ProcName
                 });
                 return res;
