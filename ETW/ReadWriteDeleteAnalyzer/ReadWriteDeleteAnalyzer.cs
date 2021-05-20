@@ -26,37 +26,47 @@ namespace ReadWriteDeleteAnalyzer
         }
         public override void Start()
         {
-            
-            var streamW = _writes.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
+
+            var streamW = _writes.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName }).Publish().RefCount();
             var streamR = _reads.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
             var streamD = _deletes.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
 
             var byPid = streamR.Merge(streamW).GroupBy(el => el.PID);
             byPid = streamR.Merge(streamW).Merge(streamD).GroupBy(el => el.PID);
+            HashSet<string> message = new HashSet<string>();
             byPid.SelectMany(pidGr =>
             {
-                string message = null;
+
                 var read = pidGr.Where(el => el.Action.CompareTo("FileIO/Read") == 0);
                 var write = pidGr.Where(el => el.Action.CompareTo("FileIO/Write") == 0);
+                
                 var delete = pidGr.Where(el => el.Action.CompareTo("FileIO/Delete") == 0);
-                
-                
-                
-                
-                var firstPart = read.CombineLatest(write,
-                    (r,w) => (r,w))
-                .Select(x => new
-                {
-                    FName = x.r.FName,
-                    ProcName = x.w.ProcName,
-                    PID = x.r.PID,
-                    writes = x.w.FName
-                }).GroupBy(el => el.FName).SelectMany(gr =>
-                {
-                    return gr.FirstOrDefaultAsync();
-             
-                });
 
+                var firstPart = read.CombineLatest(write,
+                    (r, w) => (r, w))
+                .Select(x =>
+                {
+                    //message.Clear();
+                    message.Add(x.w.FName);
+                    return new
+                    {
+                        FName = x.r.FName,
+                        ProcName = x.w.ProcName,
+                        PID = x.r.PID,
+                        writes = String.Join(", ",message.Select(e => e))
+                    };//x.w.FName });
+                    //return new
+                    //{
+                    //    FName = x.r.FName,
+                    //    ProcName = x.w.ProcName,
+                    //    PID = x.r.PID,
+                    //    writes = message.Length//x.w.FName
+                    //};
+                }).GroupBy(el => el.FName).SelectMany(gr =>
+            {
+                return gr.FirstOrDefaultAsync();
+
+            });
 
                 var res = firstPart.CombineLatest(delete).Where(p => p.First.FName.CompareTo(p.Second.FName) == 0).Select(p => new
                 {
