@@ -39,18 +39,22 @@ namespace ReadWriteDeleteAnalyzer
 
                 var read = pidGr.Where(el => el.Action.CompareTo("FileIO/Read") == 0);
                 var write = pidGr.Where(el => el.Action.CompareTo("FileIO/Write") == 0);
-                
+
                 var delete = pidGr.Where(el => el.Action.CompareTo("FileIO/Delete") == 0);
                 //gewge
                 var joined = read.GroupJoin(write,
                     _ => Observable.Timer(TimeSpan.FromMilliseconds(100)),//Observable.Timer(TimeSpan.FromTicks(1)),
                     _ => Observable.Never<Unit>().TakeUntil(read.LastOrDefaultAsync().CombineLatest(write.LastOrDefaultAsync())),
                     (r, w) => (r, w))
-                .SelectMany(x => x.w.Aggregate(new HashSet<string>(), (acc, v) => { acc.Add(v.FName); return acc; }, acc => new { FName = x.r.FName,ProcName = x.r.ProcName ,PID = x.r.PID, writes = acc }))
-                .Where(x => x.writes.Count != 0);
-
-
-
+                .SelectMany(x => x.w.Aggregate(new HashSet<string>(), (acc, v) => { acc.Add(v.FName); return acc; }, acc => new
+                {
+                    FName = x.r.FName,
+                    ProcName = x.r.ProcName,
+                    PID = x.r.PID,
+                    writes = acc
+                }
+                ))
+                .Where(x => x.writes.Count != 0).GroupBy(x => x.FName).SelectMany(gr => gr.FirstOrDefaultAsync());
 
                 var firstPart = read.CombineLatest(write,
                     (r, w) => (r, w))
@@ -63,7 +67,7 @@ namespace ReadWriteDeleteAnalyzer
                         FName = x.r.FName,
                         ProcName = x.w.ProcName,
                         PID = x.r.PID,
-                        writes = String.Join(", ",message.Select(e => e))
+                        writes = String.Join(", ", message.Select(e => e))
                     };//x.w.FName });
                     //return new
                     //{
@@ -83,7 +87,7 @@ namespace ReadWriteDeleteAnalyzer
                     PID = p.First.PID,
                     FRead = p.First.FName,
                     FDelet = p.Second.FName,
-                    FWrite = String.Join("\n\t\t ", p.First.writes.Select(i => i)) ,
+                    FWrite = String.Join("\n\t\t\t\t\t ", p.First.writes.Select(i => i)),
                     ProcName = p.First.ProcName
                 });
                 return res;
