@@ -43,7 +43,7 @@ namespace ReadWriteDeleteAnalyzer
                 var delete = pidGr.Where(el => el.Action.CompareTo("FileIO/Delete") == 0);
                 //gewge
                 var joined = read.GroupJoin(write,
-                    _ => Observable.Timer(TimeSpan.FromMilliseconds(100)),//Observable.Timer(TimeSpan.FromTicks(1)),
+                    _ => Observable.Timer(TimeSpan.FromMilliseconds(10)),//Observable.Timer(TimeSpan.FromTicks(1)),
                     _ => Observable.Never<Unit>().TakeUntil(read.LastOrDefaultAsync().CombineLatest(write.LastOrDefaultAsync())),
                     (r, w) => (r, w))
                 .SelectMany(x => x.w.Aggregate(new HashSet<string>(), (acc, v) => { acc.Add(v.FName); return acc; }, acc => new
