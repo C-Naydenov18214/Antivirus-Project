@@ -28,8 +28,8 @@ namespace ReadWriteDeleteAnalyzer
         {
 
             var streamW = _writes/*.Where(el => el.FileName.EndsWith(".txt"))*/.Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
-            var streamR = _reads.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
-            var streamD = _deletes.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
+            var streamR = _reads/*.Where(el => el.FileName.EndsWith(".txt"))*/.Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
+            var streamD = _deletes/*.Where(el => el.FileName.EndsWith(".txt"))*/.Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
 
             var byPid = streamR.Merge(streamW).GroupBy(el => el.PID);
             byPid = streamR.Merge(streamW).Merge(streamD).GroupBy(el => el.PID);
@@ -80,7 +80,7 @@ namespace ReadWriteDeleteAnalyzer
                     FRead = x.FRead,
                     PID = x.PID,
                     FDelete = String.Join(" ", x.FDelete.Select(i => i)),
-                    FWrite = String.Join(", ", x.FWrite.Select(i => i)),
+                    FWrite = String.Join(", ", x.FWrite.LastOrDefault()),
                     ProcName = x.ProcName
                 });
                 //FDelete = String.Join(" ", x.d.Select(i => i.FName)),
