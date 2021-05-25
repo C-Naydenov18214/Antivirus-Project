@@ -56,32 +56,6 @@ namespace ReadWriteDeleteAnalyzer
                 ))
                 .Where(x => x.writes.Count != 0).GroupBy(x => x.FName).SelectMany(gr => gr.FirstOrDefaultAsync());
 
-                var firstPart = read.CombineLatest(write,
-                    (r, w) => (r, w))
-                .Select(x =>
-                {
-                    //message.Clear();
-                    message.Add(x.w.FName);
-                    return new
-                    {
-                        FName = x.r.FName,
-                        ProcName = x.w.ProcName,
-                        PID = x.r.PID,
-                        writes = String.Join(", ", message.Select(e => e))
-                    };//x.w.FName });
-                    //return new
-                    //{
-                    //    FName = x.r.FName,
-                    //    ProcName = x.w.ProcName,
-                    //    PID = x.r.PID,
-                    //    writes = message.Length//x.w.FName
-                    //};
-                }).GroupBy(el => el.FName).SelectMany(gr =>
-            {
-                return gr.FirstOrDefaultAsync();
-
-            });
-
                 var res = joined.CombineLatest(delete).Where(p => p.First.FName.CompareTo(p.Second.FName) == 0).Select(p => new
                 {
                     PID = p.First.PID,

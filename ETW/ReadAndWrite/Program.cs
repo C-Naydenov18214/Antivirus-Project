@@ -11,7 +11,7 @@ namespace ReadAndWrite
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var curDir = Directory.GetCurrentDirectory();
             var dirPath = $"{curDir}\\Files";
@@ -40,7 +40,7 @@ namespace ReadAndWrite
                         string pathToWrite = dir.FullName + @"\" + (i + 100).ToString() + ".txt";
                         using (StreamWriter sw = new StreamWriter(pathToWrite, false))
                         {
-                            sw.WriteLine(data + " I did it again");
+                            await sw.WriteLineAsync(data + " I did it again");
                         }
                         
                     }
