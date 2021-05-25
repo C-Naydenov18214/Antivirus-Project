@@ -27,9 +27,9 @@ namespace ReadWriteDeleteAnalyzer
         public override void Start()
         {
 
-            var streamW = _writes/*.Where(el => el.FileName.EndsWith(".txt"))*/.Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName }).Publish().RefCount();
-            var streamR = _reads/*.Where(el => el.FileName.EndsWith(".txt"))*/.Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
-            var streamD = _deletes/*.Where(el => el.FileName.EndsWith(".txt"))*/.Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
+            var streamW = _writes/*.Where(el => el.FileName.EndsWith(".txt"))*/.Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
+            var streamR = _reads.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
+            var streamD = _deletes.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
 
             var byPid = streamR.Merge(streamW).GroupBy(el => el.PID);
             byPid = streamR.Merge(streamW).Merge(streamD).GroupBy(el => el.PID);
@@ -37,13 +37,13 @@ namespace ReadWriteDeleteAnalyzer
             byPid.SelectMany(pidGr =>
             {
 
-                var read = pidGr.Where(el => el.Action.CompareTo("FileIO/Read") == 0);
-                var write = pidGr.Where(el => el.Action.CompareTo("FileIO/Write") == 0);
+                var read = pidGr.Where(el => el.Action.CompareTo("FileIO/Read") == 0).Publish().RefCount(); ;
+                var write = pidGr.Where(el => el.Action.CompareTo("FileIO/Write") == 0).Publish().RefCount(); ;
 
-                var delete = pidGr.Where(el => el.Action.CompareTo("FileIO/Delete") == 0);
+                var delete = pidGr.Where(el => el.Action.CompareTo("FileIO/Delete") == 0).Publish().RefCount(); ;
                 //gewge
                 var joined = read.GroupJoin(write,
-                    _ => Observable.Timer(TimeSpan.FromMilliseconds(10)),//Observable.Timer(TimeSpan.FromTicks(1)),
+                    _ => Observable.Timer(TimeSpan.FromMilliseconds(100)),//Observable.Timer(TimeSpan.FromMilliseconds(10)),//Observable.Timer(TimeSpan.FromTicks(1)),
                     _ => Observable.Never<Unit>().TakeUntil(read.LastOrDefaultAsync().CombineLatest(write.LastOrDefaultAsync())),
                     (r, w) => (r, w))
                 .SelectMany(x => x.w.Aggregate(new HashSet<string>(), (acc, v) => { acc.Add(v.FName); return acc; }, acc => new
@@ -54,17 +54,38 @@ namespace ReadWriteDeleteAnalyzer
                     writes = acc
                 }
                 ))
-                .Where(x => x.writes.Count != 0).GroupBy(x => x.FName).SelectMany(gr => gr.FirstOrDefaultAsync());
+                .Where(x => x.writes.Count != 0).GroupBy(x => x.FName).SelectMany(gr => gr.FirstOrDefaultAsync()).Publish().RefCount();//.Publish().RefCount(); //
 
-                var res = joined.CombineLatest(delete).Where(p => p.First.FName.CompareTo(p.Second.FName) == 0).Select(p => new
+                var test = joined.GroupJoin(delete,
+                    _ => Observable.Timer(TimeSpan.FromMilliseconds(100)),//Observable.Timer(TimeSpan.FromTicks(1)),
+                    _ => Observable.Never<Unit>().TakeUntil(joined.LastOrDefaultAsync().CombineLatest(delete.LastOrDefaultAsync())),
+                    (j, d) => (j, d))
+                .SelectMany(x => x.d.Aggregate(new HashSet<string>(), (acc, v) =>
                 {
-                    PID = p.First.PID,
-                    FRead = p.First.FName,
-                    FDelet = p.Second.FName,
-                    FWrite = String.Join("\n\t\t ", p.First.writes.Select(i => i)).Insert(0, "\n\t\t "),
-                    ProcName = p.First.ProcName
+                    if (v.FName.CompareTo(x.j.FName) == 0)
+                    {
+                        acc.Add(v.FName);
+                    }
+                    return acc;
+
+                }, acc => new
+                {
+                    FRead = x.j.FName,
+                    PID = x.j.PID,
+                    FDelete = acc,
+                    FWrite = x.j.writes,
+                    ProcName = x.j.ProcName
+                })).Where(x => x.FDelete.Contains(x.FRead)).Select(x => new
+                {
+                    FRead = x.FRead,
+                    PID = x.PID,
+                    FDelete = String.Join(" ", x.FDelete.Select(i => i)),
+                    FWrite = String.Join(", ", x.FWrite.Select(i => i)),
+                    ProcName = x.ProcName
                 });
-                return res;
+                //FDelete = String.Join(" ", x.d.Select(i => i.FName)),
+                //    FWrite = String.Join(", ", x.j.writes.Select(i => i)),
+                return test;
 
             }).Subscribe(e =>
             {
@@ -72,7 +93,8 @@ namespace ReadWriteDeleteAnalyzer
                 try
                 {
                     r.ProcessId = e.PID;
-                    r.EventInfo = $"\n\tread -> {e.FRead} -> delete {e.FDelet} \n\t# caught writes: {e.FWrite}";
+                    r.EventInfo = $"\n\tread -> {e.FRead} -> delete {e.FDelete} \n\t# caught writes: {e.FWrite}";
+                    //r.EventInfo = $"\n\tread -> {e.FName}";// -> delete {e.FDelet} \n\t# caught writes: {e.FWrite}";
                     r.Length = r.EventInfo.Length;
                     r.ProcName = e.ProcName;
                     this.SuspiciousEvents.OnNext(r);
