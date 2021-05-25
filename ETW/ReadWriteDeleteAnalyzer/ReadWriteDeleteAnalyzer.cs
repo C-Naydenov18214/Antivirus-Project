@@ -27,9 +27,9 @@ namespace ReadWriteDeleteAnalyzer
         public override void Start()
         {
 
-            var streamW = _writes.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName }).Publish().RefCount();
-            var streamR = _reads.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
-            var streamD = _deletes.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
+            var streamW = _writes/*.Where(el => el.FileName.EndsWith(".txt"))*/.Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName }).Publish().RefCount();
+            var streamR = _reads/*.Where(el => el.FileName.EndsWith(".txt"))*/.Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
+            var streamD = _deletes/*.Where(el => el.FileName.EndsWith(".txt"))*/.Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
 
             var byPid = streamR.Merge(streamW).GroupBy(el => el.PID);
             byPid = streamR.Merge(streamW).Merge(streamD).GroupBy(el => el.PID);
@@ -61,7 +61,7 @@ namespace ReadWriteDeleteAnalyzer
                     PID = p.First.PID,
                     FRead = p.First.FName,
                     FDelet = p.Second.FName,
-                    FWrite = String.Join("\n\t\t\t\t\t ", p.First.writes.Select(i => i)),
+                    FWrite = String.Join("\n\t\t ", p.First.writes.Select(i => i)).Insert(0, "\n\t\t "),
                     ProcName = p.First.ProcName
                 });
                 return res;
@@ -72,7 +72,7 @@ namespace ReadWriteDeleteAnalyzer
                 try
                 {
                     r.ProcessId = e.PID;
-                    r.EventInfo = $"\tread {e.FRead} -> delete {e.FDelet} # caught write {e.FWrite}";
+                    r.EventInfo = $"\n\tread -> {e.FRead} -> delete {e.FDelet} \n\t# caught writes: {e.FWrite}";
                     r.Length = r.EventInfo.Length;
                     r.ProcName = e.ProcName;
                     this.SuspiciousEvents.OnNext(r);

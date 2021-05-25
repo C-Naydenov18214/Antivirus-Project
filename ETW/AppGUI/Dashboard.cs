@@ -21,7 +21,7 @@ namespace AppGUI
 
         public void AddOrUpdate(int key, KeyValuePair<SuspiciousEvent, int> val)
         {
-            _dictionary.AddOrUpdate(key, val, (oldKey, oldVal) => oldVal = new KeyValuePair<SuspiciousEvent, int>(new SuspiciousEvent(oldVal.Key.ProcessId, oldVal.Key.EventInfo, oldVal.Key.ProcName), oldVal.Value + 1));
+            _dictionary.AddOrUpdate(key, val, (oldKey, oldVal) => oldVal = new KeyValuePair<SuspiciousEvent, int>(new SuspiciousEvent(oldVal.Key.ProcessId, oldVal.Key.EventInfo + "\n" + val.Key.EventInfo, oldVal.Key.ProcName), oldVal.Value + 1));
         }
 
         public void Kill(int id)

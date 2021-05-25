@@ -5,17 +5,27 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AppGUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="1179" Width="1004">
     <Grid x:Name="Layout">
-        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="12" HorizontalAlignment="Left" Height="399" Margin="10,10,0,0" VerticalAlignment="Top" Width="772" Background="#323232"/>
-        <Button Content="Add Analyzers" HorizontalAlignment="Left" Margin="49,86,0,0" VerticalAlignment="Top" Width="106" Height="25" Click="buttonChooseAnalyzers_Click" Background="#4c4c4c" Foreground="White" RenderTransformOrigin="-1.346,-3.264"/>
-        <Button Content="Start" HorizontalAlignment="Left" Margin="49,56,0,0" VerticalAlignment="Top" Width="106" Height="25" Click="buttonStart_Click" Background="#4c4c4c" Foreground="White"/>
-        <Button Content="Quit" HorizontalAlignment="Left" Margin="710,364,0,0" VerticalAlignment="Top" Width="57" Height="25" Click="buttonQuit_Click" Background="#C41E3A" Foreground="White" RenderTransformOrigin="0.905,0.617"/>
-        <Button Content="Kill Process" HorizontalAlignment="Left" Margin="49,117,0,0" VerticalAlignment="Top" Width="106" Height="25" Click="buttonKill_Click" Background="#17ad97" Foreground="White"/>
-        <ListBox Name="AnalyzerName" Margin="211,56,90,280.5"></ListBox>
-        <TextBox Name="ProcessId" HorizontalAlignment="Left" Margin="155,117,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="25" Width="45" Background="White"/>
-        <TextBox Name="Report" IsReadOnly="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" Margin="49,173,0,0" Text="" VerticalAlignment="Top" Height="216" Width="656" Background="White"/>
-        <Label Content="Analyzers" HorizontalAlignment="Left" Margin="211,25,0,0" VerticalAlignment="Top" Foreground="White"/>
-        <Label Content="Dashboard" HorizontalAlignment="Left" Margin="49,147,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="54*"/>
+            <RowDefinition Height="233*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="742*"/>
+            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition Width="91*"/>
+            <ColumnDefinition Width="163*"/>
+        </Grid.ColumnDefinitions>
+        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="12" Margin="10" Background="#323232" Grid.ColumnSpan="4" Grid.RowSpan="2"/>
+        <Button Content="Add Analyzers" HorizontalAlignment="Left" Margin="25,86,0,0" VerticalAlignment="Top" Width="106" Height="25" Click="buttonAddAnalyzers_Click" Background="#4c4c4c" Foreground="White" RenderTransformOrigin="-1.346,-3.264"/>
+        <Button Content="Start" Margin="25,56,0,0" Click="buttonStart_Click" Background="#4c4c4c" Foreground="White" Height="25" VerticalAlignment="Top" HorizontalAlignment="Left" Width="106"/>
+        <Button Content="Quit" Margin="0,8,10,0" VerticalAlignment="Top" Height="25" Click="buttonQuit_Click" Background="#C41E3A" Foreground="White" RenderTransformOrigin="0.905,0.617" HorizontalAlignment="Right" Width="57" Grid.Column="3"/>
+        <Button Content="Kill Process" Margin="25,134,0,0" VerticalAlignment="Top" Height="24" Click="buttonKill_Click" Background="#17ad97" Foreground="White" HorizontalAlignment="Left" Width="106"/>
+        <ListBox Name="AnalyzerName" Margin="272,76,126,0" Grid.ColumnSpan="4" Height="82" VerticalAlignment="Top" RenderTransformOrigin="0.328,2.555"/>
+        <TextBox Name="ProcessId" Margin="136,134,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="24" Background="White" RenderTransformOrigin="0.433,-0.229" HorizontalAlignment="Left" Width="79"/>
+        <TextBox Name="Report" IsReadOnly="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="25,17,28,36" Text="" Background="White" Grid.ColumnSpan="4" Grid.Row="1"/>
+        <Label Content="Analyzers" HorizontalAlignment="Left" Margin="272,38,0,0" VerticalAlignment="Top" Foreground="White" Height="26" Width="60"/>
+        <Label Content="Dashboard" Margin="25,0,0,0" Foreground="White" HorizontalAlignment="Left" Width="130" Height="26" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>
