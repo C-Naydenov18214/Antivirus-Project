@@ -49,7 +49,7 @@ namespace AppGUI
             Application.Current.Shutdown();
         }
 
-        private void buttonChooseAnalyzers_Click(object sender, RoutedEventArgs e)
+        private void buttonAddAnalyzers_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new OpenFileDialog
             {

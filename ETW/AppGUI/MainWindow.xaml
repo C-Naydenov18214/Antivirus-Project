@@ -8,7 +8,7 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid x:Name="Layout">
         <Border BorderBrush="Black" BorderThickness="1" CornerRadius="12" HorizontalAlignment="Left" Height="399" Margin="10,10,0,0" VerticalAlignment="Top" Width="772" Background="#323232"/>
-        <Button Content="Choose Analyzers" HorizontalAlignment="Left" Margin="49,86,0,0" VerticalAlignment="Top" Width="106" Height="25" Click="buttonChooseAnalyzers_Click" Background="#4c4c4c" Foreground="White" RenderTransformOrigin="-1.346,-3.264"/>
+        <Button Content="Add Analyzers" HorizontalAlignment="Left" Margin="49,86,0,0" VerticalAlignment="Top" Width="106" Height="25" Click="buttonChooseAnalyzers_Click" Background="#4c4c4c" Foreground="White" RenderTransformOrigin="-1.346,-3.264"/>
         <Button Content="Start" HorizontalAlignment="Left" Margin="49,56,0,0" VerticalAlignment="Top" Width="106" Height="25" Click="buttonStart_Click" Background="#4c4c4c" Foreground="White"/>
         <Button Content="Quit" HorizontalAlignment="Left" Margin="710,364,0,0" VerticalAlignment="Top" Width="57" Height="25" Click="buttonQuit_Click" Background="#C41E3A" Foreground="White" RenderTransformOrigin="0.905,0.617"/>
         <Button Content="Kill Process" HorizontalAlignment="Left" Margin="49,117,0,0" VerticalAlignment="Top" Width="106" Height="25" Click="buttonKill_Click" Background="#17ad97" Foreground="White"/>
