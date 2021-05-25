@@ -1,39 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reactive.Concurrency;
-using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using App;
 using App.IoC;
 using ETW.Provider;
 using ETW.Reflection;
-using Kit;
 using ETW.Tracer;
+using Kit;
 using Unity;
 
-namespace App
+namespace AppGUI
 {
-    public class Application
+    public class ApplicationGUI
     {
         private static readonly Subject<SuspiciousEvent> SuspiciousEvents = new Subject<SuspiciousEvent>();
-        private static readonly EventTracer EventTracer = new EventTracer();
-        private static readonly Dashboard Dashboard = new Dashboard();
+        public static readonly EventTracer EventTracer = new EventTracer();
         private static readonly IUnityContainer Container = new UnityContainer();
+        public static Dashboard Dashboard;
 
         /// <summary>
         /// Run application.
         /// </summary>
         /// <param name="args">Rx DLLs</param>
-        public static void Run(string[] args)
+        /// <param name="report">TextBox reference</param>
+        public static void Run(string[] args, TextBox report)
         {
+            var dashboard = new Dashboard(report);
+            Dashboard = dashboard;
             var task = Task.Run(EventTracer.Test);
             Thread.Sleep(1000);
             SuspiciousEvents.Subscribe(ev =>
             {
-                Dashboard.AddOrUpdate(ev.ProcessId, new KeyValuePair<SuspiciousEvent, int>(ev,1));
-                Dashboard.Show();
+                dashboard.AddOrUpdate(ev.ProcessId, new KeyValuePair<SuspiciousEvent, int>(ev, 1));
+                dashboard.Show();
             });
             ContainerConfigurator.Initialization(Container, SuspiciousEvents);
 
@@ -41,32 +44,6 @@ namespace App
             {
                 LoadAnalyzer(value);
             }
-
-            Console.WriteLine("Please provide path to dll. Enter 'load `path to dll`'");
-            var line = Console.ReadLine();
-            while (!line.Equals("exit"))
-            {
-                if (int.TryParse(line, out var id))
-                {
-                    Dashboard.Kill(id);
-                }
-                else if (line.Contains("load"))
-                {
-                    //line = line.Replace("load", "").Replace(" ", "");
-
-                    LoadAnalyzer(line.Remove(0,5));
-                    line = Console.ReadLine();
-                }
-                else 
-                {
-                    Console.WriteLine("Enter valid id");
-                    line = Console.ReadLine();
-                }
-            }
-            Console.WriteLine("Stopping application...");
-            EventTracer.GetKernelSession()?.Dispose();
-            Console.WriteLine("Application stopped\nPress any key to exit");
-            Console.ReadKey();
         }
 
         public static void LoadAnalyzer(string value)
