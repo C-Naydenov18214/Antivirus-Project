@@ -40,6 +40,7 @@ namespace AppGUI
             foreach (var pair in _dictionary)
             {
                 WriteLn($"###\nProcess ID = {pair.Key}, Process name: {pair.Value.Key.ProcName}, Suspicious Events Count = {pair.Value.Value}, Event info: {pair.Value.Key.EventInfo}");
+                
             }
         }
         public void WriteLn(string text)

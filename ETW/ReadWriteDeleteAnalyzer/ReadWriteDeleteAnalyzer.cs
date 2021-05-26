@@ -62,20 +62,46 @@ namespace ReadWriteDeleteAnalyzer
                         PID = x.dd.PID,
                         writes = acc
                     }
-                )).Where(x => x.writes.Count != 0);
+                )).Where(x => x.writes.Count != 0).Publish().RefCount();
                 });
+
+                var prdw = prd.GroupJoin(write,
+                    _ => Observable.Timer(TimeSpan.FromTicks(1)),
+                    _ => Observable.Timer(TimeSpan.FromMilliseconds(100)),//Observable.Never<Unit>().TakeUntil(prd.LastOrDefaultAsync().CombineLatest(write.LastOrDefaultAsync())),
+                    (rrd, w) => (rrd, w)).SelectMany(x => x.w.Aggregate(new HashSet<string>(), (acc, v) => { acc.Add(v.FName); return acc; }, acc => new
+                    {
+                        FDelete = x.rrd.FName,
+                        PID = x.rrd.PID,
+                        ProcName = x.rrd.ProcName,
+                        FRead = x.rrd.writes,
+                        FWrite = acc
+
+                    }
+                      )).Where(x => x.FWrite.Count != 0).Select(x=> new {
+                          FDelete = x.FDelete,
+                          PID = x.PID,
+                          ProcName = x.ProcName,
+                          FRead = String.Join(", ",x.FRead.Select(i => i)),
+                          FWrite = String.Join(", ",x.FWrite.Select(i => i))
+                      });
+
+
                 /*.Where(x => x.writes.Count != 0)*/;//.GroupBy(x => x.FName).SelectMany(gr => gr.FirstOrDefaultAsync()).Publish().RefCount();
-                return prd;
-                
-            }).Subscribe(e =>
+                return prdw;//prd;
+
+            })
+
+
+
+                /*.Subscribe(e =>
                 {
                     var r = new SuspiciousEvent();
                     try
                     {
                         r.ProcessId = e.PID;
                         r.EventInfo = $"\n\tread -> {e.FName} -> delete NO \n\t# caught writes: {String.Join(", ", e.writes.Select(i => i))}";
-                    //r.EventInfo = $"\n\tread -> {e.FName}";// -> delete {e.FDelet} \n\t# caught writes: {e.FWrite}";
-                    r.Length = r.EventInfo.Length;
+                        //r.EventInfo = $"\n\tread -> {e.FName}";// -> delete {e.FDelet} \n\t# caught writes: {e.FWrite}";
+                        r.Length = r.EventInfo.Length;
                         r.ProcName = e.ProcName;
                         this.SuspiciousEvents.OnNext(r);
                     }
@@ -83,8 +109,8 @@ namespace ReadWriteDeleteAnalyzer
                     {
                         Console.WriteLine(ex.Message);
                     }
-                });
-            /*.Subscribe(e =>
+                });*/
+            .Subscribe(e =>
             {
                 var r = new SuspiciousEvent();
                 try
@@ -100,7 +126,7 @@ namespace ReadWriteDeleteAnalyzer
                 {
                     Console.WriteLine(ex.Message);
                 }
-            });*/
+            });
 
 
         }
