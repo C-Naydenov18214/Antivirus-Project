@@ -27,12 +27,12 @@ namespace ReadWriteDeleteAnalyzer
         public override void Start()
         {
 
-            var streamW = _writes/*.Where(el => el.FileName.EndsWith(".txt"))*/.Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
-            var streamR = _reads/*.Where(el => el.FileName.EndsWith(".txt"))*/.Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
-            var streamD = _deletes/*.Where(el => el.FileName.EndsWith(".txt"))*/.Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
+            var streamW = _writes.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
+            var streamR = _reads.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
+            var streamD = _deletes.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
 
-            var byPid = streamR.Merge(streamW).GroupBy(el => el.PID);
-            byPid = streamR.Merge(streamW).Merge(streamD).GroupBy(el => el.PID);
+            
+            var byPid = streamR.Merge(streamW).Merge(streamD).GroupBy(el => el.PID);
             HashSet<string> message = new HashSet<string>();
             byPid.SelectMany(pidGr =>
             {
@@ -41,7 +41,11 @@ namespace ReadWriteDeleteAnalyzer
                 var write = pidGr.Where(el => el.Action.CompareTo("FileIO/Write") == 0).Publish().RefCount(); ;
 
                 var delete = pidGr.Where(el => el.Action.CompareTo("FileIO/Delete") == 0).Publish().RefCount(); ;
-                //gewge
+
+
+
+
+
                 var joined = read.GroupJoin(write,
                     _ => Observable.Timer(TimeSpan.FromMilliseconds(100)),//Observable.Timer(TimeSpan.FromMilliseconds(10)),//Observable.Timer(TimeSpan.FromTicks(1)),
                     _ => Observable.Never<Unit>().TakeUntil(read.LastOrDefaultAsync().CombineLatest(write.LastOrDefaultAsync())),
