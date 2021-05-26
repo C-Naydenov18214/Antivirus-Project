@@ -26,6 +26,7 @@ namespace ETW
                 .Do(x => Console.WriteLine($"merge: {x.FileName}"))
                 .GroupBy(el => el.FileName);
 
+
             var pairs = byFile.SelectMany(fgr =>
             {
                 var read = fgr.OfType<FR>().Publish().RefCount();
@@ -39,11 +40,11 @@ namespace ETW
                     (cl, wr) => (cl, wr))
                 .SelectMany(x => x.wr.Aggregate(new HashSet<FileEvent>(), (acc, v) => { acc.Add(v); return acc; }, acc => new { fName = x.cl.FileName, closeBy = x.cl.ProcessID, actions = acc }))
                 .Where(x => x.actions.Count != 0);
-            }).Subscribe(x =>
+            });/*.Subscribe(x =>
             {
                 suspSub.OnNext(x.closeBy);
                 Console.WriteLine($"-------\t{x.fName}\tclose: {x.closeBy}\tactions:\n\t{String.Join(",\n\t", x.actions.Select(i => i.ToString()))}");
-            });
+            });*/
 
 
             //.Subscribe(x => Console.WriteLine($"-------\t{x.fname}\tread: {x.readBy}\twrites: {String.Join(", ", x.writes.Select(i => i.ToString()))}"));

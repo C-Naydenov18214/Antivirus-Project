@@ -31,8 +31,12 @@ namespace ReadWriteDeleteAnalyzer
             var streamR = _reads.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
             var streamD = _deletes.Where(el => el.FileName.EndsWith(".txt")).Select(el => new { PID = el.ProcessID, FName = el.FileName, Action = el.EventName, ProcName = el.ProcessName });
 
-            
+
             var byPid = streamR.Merge(streamW).Merge(streamD).GroupBy(el => el.PID);
+
+
+
+
             HashSet<string> message = new HashSet<string>();
             byPid.SelectMany(pidGr =>
             {
@@ -40,58 +44,47 @@ namespace ReadWriteDeleteAnalyzer
                 var read = pidGr.Where(el => el.Action.CompareTo("FileIO/Read") == 0).Publish().RefCount(); ;
                 var write = pidGr.Where(el => el.Action.CompareTo("FileIO/Write") == 0).Publish().RefCount(); ;
 
-                var delete = pidGr.Where(el => el.Action.CompareTo("FileIO/Delete") == 0).Publish().RefCount(); ;
-
-
-
-
-
-                var joined = read.GroupJoin(write,
-                    _ => Observable.Timer(TimeSpan.FromMilliseconds(100)),//Observable.Timer(TimeSpan.FromMilliseconds(10)),//Observable.Timer(TimeSpan.FromTicks(1)),
-                    _ => Observable.Never<Unit>().TakeUntil(read.LastOrDefaultAsync().CombineLatest(write.LastOrDefaultAsync())),
-                    (r, w) => (r, w))
-                .SelectMany(x => x.w.Aggregate(new HashSet<string>(), (acc, v) => { acc.Add(v.FName); return acc; }, acc => new
+                var delete = pidGr.Where(el => el.Action.CompareTo("FileIO/Delete") == 0).Publish().RefCount();
+                var rd = read.Merge(delete).GroupBy(x => x.FName);
+                var prd = rd.SelectMany(fGr =>
                 {
-                    FName = x.r.FName,
-                    ProcName = x.r.ProcName,
-                    PID = x.r.PID,
-                    writes = acc
-                }
-                ))
-                .Where(x => x.writes.Count != 0).GroupBy(x => x.FName).SelectMany(gr => gr.FirstOrDefaultAsync()).Publish().RefCount();//.Publish().RefCount(); //
+                    var r = fGr.Where(el => el.Action.CompareTo("FileIO/Read") == 0).Publish().RefCount();
+                    var d = fGr.Where(el => el.Action.CompareTo("FileIO/Delete") == 0).Publish().RefCount();
 
-                var test = joined.GroupJoin(delete,
-                    _ => Observable.Timer(TimeSpan.FromMilliseconds(100)),//Observable.Timer(TimeSpan.FromTicks(1)),
-                    _ => Observable.Never<Unit>().TakeUntil(joined.LastOrDefaultAsync().CombineLatest(delete.LastOrDefaultAsync())),
-                    (j, d) => (j, d))
-                .SelectMany(x => x.d.Aggregate(new HashSet<string>(), (acc, v) =>
-                {
-                    if (v.FName.CompareTo(x.j.FName) == 0)
+                    return d.GroupJoin(r,
+                        _ => Observable.Timer(TimeSpan.FromTicks(1)),
+                        _ => Observable.Never<Unit>().TakeUntil(d.LastOrDefaultAsync().CombineLatest(r.LastOrDefaultAsync())),
+                        (dd, rr) => (dd, rr))
+                    .SelectMany(x => x.rr.Aggregate(new HashSet<string>(), (acc, v) => { acc.Add(v.FName); return acc; }, acc => new
                     {
-                        acc.Add(v.FName);
+                        FName = x.dd.FName,
+                        ProcName = x.dd.ProcName,
+                        PID = x.dd.PID,
+                        writes = acc
                     }
-                    return acc;
-
-                }, acc => new
-                {
-                    FRead = x.j.FName,
-                    PID = x.j.PID,
-                    FDelete = acc,
-                    FWrite = x.j.writes,
-                    ProcName = x.j.ProcName
-                })).Where(x => x.FDelete.Contains(x.FRead)).Select(x => new
-                {
-                    FRead = x.FRead,
-                    PID = x.PID,
-                    FDelete = String.Join(" ", x.FDelete.Select(i => i)),
-                    FWrite = String.Join(", ", x.FWrite.LastOrDefault()),
-                    ProcName = x.ProcName
+                )).Where(x => x.writes.Count != 0);
                 });
-                //FDelete = String.Join(" ", x.d.Select(i => i.FName)),
-                //    FWrite = String.Join(", ", x.j.writes.Select(i => i)),
-                return test;
-
+                /*.Where(x => x.writes.Count != 0)*/;//.GroupBy(x => x.FName).SelectMany(gr => gr.FirstOrDefaultAsync()).Publish().RefCount();
+                return prd;
+                
             }).Subscribe(e =>
+                {
+                    var r = new SuspiciousEvent();
+                    try
+                    {
+                        r.ProcessId = e.PID;
+                        r.EventInfo = $"\n\tread -> {e.FName} -> delete NO \n\t# caught writes: {String.Join(", ", e.writes.Select(i => i))}";
+                    //r.EventInfo = $"\n\tread -> {e.FName}";// -> delete {e.FDelet} \n\t# caught writes: {e.FWrite}";
+                    r.Length = r.EventInfo.Length;
+                        r.ProcName = e.ProcName;
+                        this.SuspiciousEvents.OnNext(r);
+                    }
+                    catch (NullReferenceException ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                });
+            /*.Subscribe(e =>
             {
                 var r = new SuspiciousEvent();
                 try
@@ -107,7 +100,7 @@ namespace ReadWriteDeleteAnalyzer
                 {
                     Console.WriteLine(ex.Message);
                 }
-            });
+            });*/
 
 
         }
