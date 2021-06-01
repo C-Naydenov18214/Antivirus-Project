@@ -60,7 +60,7 @@ namespace CreateWriteAnalyzer
                 {
 
                     r.ProcessId = e.writeBy;
-                    r.EventInfo = $"Process created a file and wrote data to it";
+                    r.EventInfo = $"Process {e.writeBy} created {e.fname} and wrote data to it";
                     r.Length = r.EventInfo.Length;
                     r.ProcName = e.procName;
                     this.SuspiciousEvents.OnNext(r);
