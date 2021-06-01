@@ -10,15 +10,15 @@ using System.Threading.Tasks;
 
 namespace ETW
 {
-    class WriteLoadPattern
+    public class WriteLoadPattern
     {
-        public static void TestVarient(IObservable<IGroupedObservable<string, FileEvent>> byFiles)
+        public  int TestVarient()
         {
             var loadSubj = new Subject<FileEvent>();
             var writeSubj = new Subject<FileEvent>();
             var loadObs = loadSubj;
             var writeObs = writeSubj;
-
+            int counter = 0;
             var byFile = loadObs.Merge<FileEvent>(writeObs)
                 /*.Do(x => Console.WriteLine($"merge: {x.FileName}"))*/
                 .GroupBy(el => el.FileName);
@@ -33,7 +33,11 @@ namespace ETW
                     (l, w) => (l, w))
                 .SelectMany(x => x.w.Aggregate(new HashSet<int>(), (acc, v) => { acc.Add(v.ProcessID); return acc; }, acc => new { fname = x.l.FileName, loadBy = x.l.ProcessID, writes = acc }))
                 .Where(x => x.writes.Contains(x.loadBy) && x.writes.Count != 0);
-            }).Subscribe(x => Console.WriteLine($"-------\t{x.fname}\tload: {x.loadBy}\twrites: {String.Join(", ", x.writes.Select(i => i.ToString()))}"));
+            }).Subscribe(x =>
+            {
+                counter++;
+                Console.WriteLine($"-------\t{x.fname}\tload: {x.loadBy}\twrites: {String.Join(", ", x.writes.Select(i => i.ToString()))}");
+            });
             /*for (int i = 0; i < 10; i++)
             {
                 
@@ -66,7 +70,7 @@ namespace ETW
             
             loadSubj.OnCompleted();
             writeSubj.OnCompleted();
-
+            return counter;
         }
     }
 }

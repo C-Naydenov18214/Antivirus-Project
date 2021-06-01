@@ -25,9 +25,9 @@ namespace ETW
         private static void Main(string[] args)
         {
 
-            ETW.ForTests.Tests.Run();
-            
-            
+            //ETW.ForTests.Tests.Run();
+            var t = new WriteLoadPattern();
+            t.TestVarient();
             /*var eventTracer = new EventTracer(Console.Out);
 
             var task = Task.Run(eventTracer.Test);

@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileCreator", "FileCreator\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppGUI", "AppGUI\AppGUI.csproj", "{DB10287F-3E4B-4E44-A2EC-0044265524BD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject1", "TestProject1\TestProject1.csproj", "{CBABB134-3DBC-400E-954F-67452F9587F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{DB10287F-3E4B-4E44-A2EC-0044265524BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB10287F-3E4B-4E44-A2EC-0044265524BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB10287F-3E4B-4E44-A2EC-0044265524BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBABB134-3DBC-400E-954F-67452F9587F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBABB134-3DBC-400E-954F-67452F9587F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBABB134-3DBC-400E-954F-67452F9587F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBABB134-3DBC-400E-954F-67452F9587F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
